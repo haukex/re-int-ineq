@@ -35,6 +35,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: cache-perl-modules
+        #TODO Later: "Failed to save: Unable to reserve cache with key
+        # bacba3f75e5318670eca90caa4c7704855902265278bb76da6439b4e664881ce,
+        # another job may be creating this cache. More details: Cache already exists."
+        # => a problem when all the jobs run in parallel I guess?
         uses: actions/cache@v4
         with:
           path: /usr/src/perl-modules

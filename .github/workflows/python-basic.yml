@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - 'py/**'
+    # since this already fires for each push, no need to fire for tags too:
+    tags-ignore: '**'
   pull_request:
     paths:
       - 'py/**'

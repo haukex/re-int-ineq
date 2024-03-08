@@ -57,6 +57,8 @@ Releasing
   Title "Regexp::IntInequality vX.XX", body from the changelog reformatted as
   Markdown, links to Metacpan release and CPAN download link; attach `.tar.gz`
   to release
+  - TODO Later: Though the above will be different when publishing
+    simultaneous releases of all ports..
 - [ ] `make distclean`
 - [ ] Add placeholder for next version to `Changes`
 
