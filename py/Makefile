@@ -29,6 +29,7 @@ installdeps:  ## Install project dependencies
 	$(PYTHON3BIN) -m pip install --upgrade --upgrade-strategy=eager --no-warn-script-location $(foreach x,$(requirement_txts),-r $(x))
 	# for modules/packages:
 	# $(PYTHON3BIN) -m pip install --editable .
+	npm ci
 
 smoke-checks:  ## Basic smoke tests
 	@set -euxo pipefail
@@ -65,7 +66,7 @@ shellcheck:  ## Run shellcheck
 ver-checks:  ## Checks that depend on the Python version
 	@set -euxo pipefail
 	# https://microsoft.github.io/pyright/#/command-line
-	pyright --project pyproject.toml --pythonpath "$$( $(PYTHON3BIN) -c 'import sys; print(sys.executable)' )" $(py_code_locs)
+	npx pyright --project pyproject.toml --pythonpath "$$( $(PYTHON3BIN) -c 'import sys; print(sys.executable)' )" $(py_code_locs)
 	mypy --config-file pyproject.toml $(py_code_locs)
 	# Note I'm not sure if the following are actually version-dependent, but because they parse the Python code, I'll leave them here.
 	flake8 --toml-config=pyproject.toml $(py_code_locs)

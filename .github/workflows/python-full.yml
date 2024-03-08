@@ -21,6 +21,11 @@ jobs:
         # https://github.com/actions/checkout/issues/135
         run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: py/package-lock.json
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -31,10 +36,10 @@ jobs:
           # remember to keep in sync with Makefile:
           cache-dependency-path: |
             dev/requirements.txt
-      - name: Install Dependencies
+      - name: Install dependencies
         working-directory: ./py
         run: make installdeps
-      - name: Run Checks and Lint
+      - name: Run checks and lint
         working-directory: ./py
         run: make smoke-checks ver-checks
       - name: Run version-independent checks
