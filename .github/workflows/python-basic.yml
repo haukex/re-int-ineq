@@ -5,7 +5,7 @@ on:
     paths:
       - 'py/**'
     # since this already fires for each push, no need to fire for tags too:
-    tags-ignore: '**'
+    #tags-ignore: '**'  # See the to-do in perl-basic.yml
   pull_request:
     paths:
       - 'py/**'
