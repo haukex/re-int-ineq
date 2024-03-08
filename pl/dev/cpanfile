@@ -1,0 +1,4 @@
+# cpanm --installdeps .
+requires 'IO::Socket::SSL', '>= 1.56';
+requires 'Net::SSLeay', '>= 1.49';
+requires 'Module::CPANfile', '>= 1.1004';

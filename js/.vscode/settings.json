@@ -1,0 +1,28 @@
+{
+    "git.openRepositoryInParentFolders": "always",
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "editor.rulers": [ 150 ],
+    "cSpell.language": "en,en-US",
+    "cSpell.words": [ "Daempfling", "Hauke" ],
+    "cSpell.ignoreWords": [
+        "allint",
+        "errorcases",
+        "haukex",
+        "ineq",
+        "lookaround",
+        "mkre",
+        "nevermatch",
+        "nonneg",
+        "rangetests",
+        "regexes",
+        "subex",
+        "testcases",
+        "testranges"
+    ],
+    "eslint.validate": [
+        "javascript",
+        "typescript"
+    ],
+}
+/* vim: set filetype=javascript ts=4 sw=4 expandtab : */

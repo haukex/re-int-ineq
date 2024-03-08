@@ -1,0 +1,5 @@
+node_modules/
+/coverage/
+/dist/re-int-ineq.*
+/*.tgz
+/dev/test-proj/*.js

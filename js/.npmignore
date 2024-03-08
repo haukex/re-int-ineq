@@ -1,0 +1,6 @@
+/.vscode/
+/dev/
+/coverage/
+/*.tgz
+__tests__/
+/dist/.eslintrc*

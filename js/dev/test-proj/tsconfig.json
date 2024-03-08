@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "ES2015",
+    "moduleResolution": "Node",
+    "noEmitOnError": true,
+    "esModuleInterop": true,
+    "strict": true,
+  },
+}
+/* vim: set filetype=javascript ts=2 sw=2 expandtab : */

@@ -1,0 +1,79 @@
+{
+    "name": "re-int-ineq",
+    "version": "0.9.0",
+    "description": "Generate regular expressions to match integers greater than / less than / etc. a value",
+    "author": {
+        "name": "Hauke D",
+        "email": "haukex@zero-g.net"
+    },
+    "license": "LGPL-3.0-or-later",
+    "homepage": "https://github.com/haukex/re-int-ineq",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/haukex/re-int-ineq.git",
+        "directory": "js"
+    },
+    "bugs": "https://github.com/haukex/re-int-ineq/issues",
+    "type": "module",
+    "main": "dist/re-int-ineq.js",
+    "types": "dist/re-int-ineq.d.ts",
+    "scripts": {
+        "test": "jest",
+        "prepublish": "tsc"
+    },
+    "devDependencies": {
+        "typescript": "^5.3.3",
+        "jest": "29.1.2",
+        "@jest/globals": "29.1.2",
+        "ts-jest": "29.1.2",
+        "jest-runner-eslint": "^2.2.0",
+        "eslint": "^8.57.0",
+        "eslint-plugin-import": "^2.29.1",
+        "eslint-config-standard-with-typescript": "^43.0.1",
+        "@typescript-eslint/eslint-plugin": "^6.21.0",
+        "typedoc": "^0.25.10",
+        "typedoc-plugin-markdown": "^3.17.1",
+        "typedoc-plugin-rename-defaults": "^0.7.0"
+    },
+    "jest": {
+        "projects": [
+            {
+                "displayName": "test",
+                "preset": "ts-jest"
+            },
+            {
+                "displayName": "lint",
+                "runner": "jest-runner-eslint"
+            }
+        ],
+        "collectCoverage": true,
+        "coverageThreshold": {
+            "global": {
+                "functions": 100,
+                "lines": 100,
+                "statements": 100,
+                "branches": 100
+            }
+        }
+    },
+    "eslintConfig": {
+        "root": true,
+        "env": { "es2018": true },
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "ecmaVersion": "latest",
+            "sourceType": "module"
+        },
+        "plugins": [ "@typescript-eslint" ],
+        "rules": {
+            "linebreak-style": ["error", "unix"],
+            "semi": ["warn", "never"],
+            "indent": ["error", 2],
+            "quotes": ["warn", "single"]
+        }
+    }
+}

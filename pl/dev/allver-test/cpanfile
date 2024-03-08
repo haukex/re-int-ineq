@@ -1,0 +1,2 @@
+requires 'App::Prove';
+requires 'Test::More';

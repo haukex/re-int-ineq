@@ -1,0 +1,29 @@
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+name: Python Tests, Lint, and Coverage
+on:
+  push:
+    paths:
+      - 'py/**'
+  pull_request:
+    paths:
+      - 'py/**'
+jobs:
+  tests:
+    name: Python 3.12 on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          # https://github.com/actions/setup-python#caching-packages-dependencies
+          cache: pip
+          # remember to keep in sync with Makefile:
+          cache-dependency-path: |
+            dev/requirements.txt
+      - name: Install dependencies
+        working-directory: ./py
+        run: make installdeps
+      - name: Tests incl. lint and coverage
+        working-directory: ./py
+        run: make test

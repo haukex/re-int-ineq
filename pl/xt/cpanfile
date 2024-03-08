@@ -1,0 +1,6 @@
+# cpanm --installdeps .
+requires 'Test::Perl::Critic';
+requires 'Test::MinimumVersion';
+requires 'Test::Pod';
+requires 'Test::DistManifest';
+requires 'Capture::Tiny';

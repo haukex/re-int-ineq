@@ -1,0 +1,52 @@
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+name: Python Tests, Lint, and Coverage on all versions and OSes
+on:
+  push:
+    # this workflow is somewhat expensive, so only run when explicitly tagged
+    tags:
+      - '**'
+jobs:
+  tests:
+    name: CPython ${{ matrix.python-version }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [Ubuntu, Windows, macOS]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}-latest
+    # Reminder: Keep in sync with dev/local-actions.sh
+    steps:
+      - name: Disable autocrlf on Windows
+        if: ${{ matrix.os == 'Windows' }}
+        # https://github.com/actions/checkout/issues/135
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+          # https://github.com/actions/setup-python#caching-packages-dependencies
+          cache: pip
+          # remember to keep in sync with Makefile:
+          cache-dependency-path: |
+            dev/requirements.txt
+      - name: Install Dependencies
+        working-directory: ./py
+        run: make installdeps
+      - name: Run Checks and Lint
+        working-directory: ./py
+        run: make smoke-checks ver-checks
+      - name: Run version-independent checks
+        if: ${{ matrix.python-version == '3.12' }}
+        working-directory: ./py
+        run: make other-checks
+      - name: Run nix-checks and shellcheck on Linux
+        working-directory: ./py
+        if: ${{ matrix.os == 'Ubuntu' }}
+        # Only run nix-checks on Ubuntu because it doesn't work on Windows and bash is too old on macOS.
+        # Only run shellcheck on Ubuntu because it's only installed there by default.
+        run: make nix-checks shellcheck
+      - name: Tests and Coverage
+        working-directory: ./py
+        run: make coverage

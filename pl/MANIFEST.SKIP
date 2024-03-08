@@ -1,0 +1,12 @@
+^Makefile$
+^MYMETA
+^MANIFEST\.
+(^|/)\.git
+(^|/)\..*\.swp$
+^pm_to_blib$
+^cover_db/
+^blib/
+^dev/
+^.vscode/
+^xt/
+\.tar\.gz$

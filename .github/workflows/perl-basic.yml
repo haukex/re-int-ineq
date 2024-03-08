@@ -1,0 +1,20 @@
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+name: Perl Basic Tests (only)
+on:
+  push:
+    paths:
+      - 'pl/**'
+  pull_request:
+    paths:
+      - 'pl/**'
+jobs:
+  tests:
+    # Uses the Perl that comes preinstalled on all GH Action runners
+    # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+    name: Default Perl on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        working-directory: ./pl
+        run: prove -l
