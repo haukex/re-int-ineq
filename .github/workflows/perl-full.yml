@@ -38,7 +38,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/src/perl-modules
-          key: ${{ hashFiles('dev/allver-test/modules.txt') }}
+          key: ${{ hashFiles('pl/dev/allver-test/modules.txt') }}
       - name: Download dependencies
         if: steps.cache-perl-modules.outputs.cache-hit != 'true'
         working-directory: ./pl
