@@ -47,6 +47,7 @@ authorcover:
 	cpanm Devel::Cover JSON::MaybeXS
 	cover -test
 	cover -silent -report json
-	[[ "$$( jq .summary.Total.total.percentage cover_db/cover.json )" =~ ^100(\.0+)?$$ ]] && echo "Coverage 100% OK!"
+	# Note Perl Docker images don't have jq installed, so use Perl
+	perl -wMstrict -MJSON::PP=decode_json -0777 -ne 'my $p=decode_json($_)->{summary}{Total}{total}{percentage}; die "Coverage $p%\n" unless $p==100; print "Covage $p% OK!\n"' cover_db/cover.json
 MAKE_FRAG
 }
