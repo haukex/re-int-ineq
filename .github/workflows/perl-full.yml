@@ -71,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install cpanm
-        run: curl -L https://cpanmin.us | perl - App::cpanminus
+        run: curl -L https://cpanmin.us | perl - --sudo App::cpanminus
       - name: Install dependencies
         working-directory: ./pl/xt
         run: cpanm --installdeps .
