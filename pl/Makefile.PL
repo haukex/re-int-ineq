@@ -48,6 +48,6 @@ authorcover:
 	cover -test
 	cover -silent -report json
 	# Note Perl Docker images don't have jq installed, so use Perl
-	perl -wMstrict -MJSON::PP=decode_json -0777 -ne 'my $p=decode_json($_)->{summary}{Total}{total}{percentage}; die "Coverage $p%\n" unless $p==100; print "Covage $p% OK!\n"' cover_db/cover.json
+	perl -wMstrict -MJSON::PP=decode_json -0777 -ne 'my $$p=decode_json($$_)->{summary}{Total}{total}{percentage}; die "Coverage $$p%\n" unless $$p==100; print "Covage $$p% OK!\n"' cover_db/cover.json
 MAKE_FRAG
 }
