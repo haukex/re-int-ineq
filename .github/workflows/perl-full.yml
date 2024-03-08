@@ -69,9 +69,6 @@ jobs:
     container:
       # https://github.com/haukex/docker-perl-author-tests
       image: ghcr.io/haukex/docker-perl-author-tests:v0.9
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - name: Tests and author tests
