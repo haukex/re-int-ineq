@@ -88,11 +88,12 @@ coverage:  ## Run unit tests with coverage
 	# $(PYTHON3BIN) -m coverage html --rcfile=pyproject.toml
 	$(PYTHON3BIN) -m coverage xml --rcfile=pyproject.toml
 	set +x
-	# we don't use --fail_under=100 above because then the report won't be written. so instead:
-	PERCENT_COVERED="$$( $(PYTHON3BIN) -m coverage json --rcfile=pyproject.toml -o- | jq .totals.percent_covered )"
-	[[ "$$PERCENT_COVERED" =~ ^100(\.0+)?$$ ]] && COLORCODE="\e[2;32m" || COLORCODE="\e[1;31m"
-	echo -e "=> $$COLORCODE$$(LC_NUMERIC=C printf '%.1f' "$$PERCENT_COVERED")% Coverage\e[0m <="
-	[[ "$$PERCENT_COVERED" =~ ^100(\.0+)?$$ ]]
+	# We don't use --fail_under=100 above because then the report won't be written.
+	# Also, the GitHub macOS runners didn't like the following (probably due to the old bash),
+	# so we'll just hand it off to Perl:
+	$(PYTHON3BIN) -m coverage json --rcfile=pyproject.toml -o- | jq .totals.percent_covered \
+		| perl -wMstrict -0777 -MTerm::ANSIColor=colored -ne \
+		's/\s+\z//; print "=> ",colored([$$_==100?"green":"red"],"$$_% Coverage")," <=\n"; exit($$_==100?0:1)'
 
 # https://stackoverflow.com/q/8889035
 help:   ## Show this help
