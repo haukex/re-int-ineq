@@ -64,16 +64,18 @@ jobs:
         working-directory: ./pl
         run: prove -l
   author-tests:
-    # Uses the Perl that comes preinstalled on all GH Action runners
-    # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-    name: Default Perl on Ubuntu
+    # Using the Perl that is preinstalled on the GH Action Runner is a bit of
+    # a pain here because cpanm isn't installed and we don't have root, and
+    # just using a Perl container is easier than setting up local::lib.
+    name: Perl 5.38 on Linux
     runs-on: ubuntu-latest
+    container:
+      image: perl:5.38
     steps:
       - uses: actions/checkout@v4
-      - name: Install cpanm
-        run: curl -L https://cpanmin.us | perl - --sudo App::cpanminus
       - name: Install dependencies
         working-directory: ./pl/xt
+        #TODO: This takes a long time, can we cache it?
         run: cpanm --installdeps .
       - name: Tests and author tests
         working-directory: ./pl
