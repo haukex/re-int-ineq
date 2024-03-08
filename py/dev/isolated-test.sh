@@ -14,5 +14,6 @@ rsync -a tests "$TEMPDIR" --exclude=__pycache__
 
 pushd "$TEMPDIR"
 python3 -m venv venv
+venv/bin/python3 -m pip -q install --upgrade pip
 venv/bin/python3 -m pip -q install "$DISTFILE"
-venv/bin/python3 -Im unittest
+venv/bin/python3 -Im unittest -v

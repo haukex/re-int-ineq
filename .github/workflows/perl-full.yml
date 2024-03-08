@@ -4,7 +4,7 @@ on:
   push:
     # this workflow is somewhat expensive, so only run when explicitly tagged
     tags:
-      - '**'
+      - 'pl-**'
 jobs:
   all-ver:
     name: Perl ${{ matrix.perlver }} on Linux

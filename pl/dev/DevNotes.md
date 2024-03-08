@@ -44,7 +44,8 @@ Releasing
 ---------
 
 - [ ] `git commit` and `git push` if needed
-- [ ] `git tag vX.XX`
+- [ ] `git tag pl-vX.XX`
+  - [ ] `git tag vX.X` - **if** making a simultaneous release of all ports
 - [ ] `git push --tags`
 - [ ] watch GitHub Actions
 - [ ] `perl Makefile.PL` - inspect output for warnings/errors!

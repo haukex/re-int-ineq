@@ -1,11 +1,11 @@
 Regular Expression Integer Inequalities
 =======================================
 
-This module provides a single function, :func:`~re_int_ineq.re_int_ineq`, which
-generates regular expressions that match integers that fulfill a specified
-inequality (greater than, less than, and so on). By default, only non-negative
-integers are matched (minus signs are ignored), and optionally all integers can
-be matched, including negative. Integers with leading zeros are never matched.
+This module provides a single function, ``re_int_ineq``, which generates
+regular expressions that match integers that fulfill a specified inequality
+(greater than, less than, and so on). By default, only non-negative integers
+are matched (minus signs are ignored), and optionally all integers can be
+matched, including negative. Integers with leading zeros are never matched.
 
 **Note:** Normally, this is not a task for regular expressions, instead it is
 often preferable to use regular expressions or other methods to extract the
@@ -18,11 +18,12 @@ The generated regular expressions are valid in Perl, Python, and JavaScript
 ES2018 or later, and probably in other languages that support lookaround
 assertions with the same syntax.
 
-.. seealso::
+See Also
+--------
 
-    **Perl version:** https://metacpan.org/pod/Regexp::IntInequality
+- **Perl version:** https://metacpan.org/pod/Regexp::IntInequality
 
-    **JavaScript port:** https://www.npmjs.com/package/re-int-ineq
+- **JavaScript port:** https://www.npmjs.com/package/re-int-ineq
 
 ``re_int_ineq``
 ---------------
@@ -83,11 +84,11 @@ user input.
     string. If you want to validate that a string contains *only* an
     integer, then you will need to add additional anchors. For example,
     you might add ``\A`` before the generated regex and ``\Z`` after,
-    and use :func:`re.fullmatch` to validate that a string contains only
-    that integer. However, this task is more commonly done by first
-    checking that the string is a valid integer in general, such as via
-    :func:`int`, and then using normal numeric comparisons to check that it
-    is in the range you expect.
+    and use ``re.fullmatch`` to validate that a string contains only that
+    integer. However, this task is more commonly done by first checking
+    that the string is a valid integer in general, such as via ``int()``,
+    and then using normal numeric comparisons to check that it is in the
+    range you expect.
 
     If on the other hand you want to turn off the default anchors described
     above, perhaps because you want to implement your own, then you can

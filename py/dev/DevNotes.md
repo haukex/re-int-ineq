@@ -30,7 +30,7 @@ Release Preparation
   - [ ] GitHub Issues
   - [ ] Git stash
   - [ ] Whether the Python versions in `dev/local-actions.sh` and the GitHub Actions Workflows need updating
-- [ ] Spellcheck documentation in `re_int_ineq.py`
+- [ ] Spellcheck documentation in `re_int_ineq/__init__.py`
 - [ ] `PYTHONPATH=. dev/mkreadme.py` - generate `README.rst`
 - [ ] Bump version number in `pyproject.toml`
 - [ ] Update `CHANGELOG.rst` (reference: <https://github.com/pypa/packaging/blob/main/CHANGELOG.rst>)
@@ -41,16 +41,20 @@ Releasing
 **These steps should be done on Linux!**
 
 - [ ] `git commit` and `git push` if needed
-- [ ] `git tag vX.X.X`
+- [ ] `git tag py-vX.X.X`
+  - [ ] **If** making a simultaneous release of all ports, see `/pl/DevNotes.md`!
 - [ ] `git push --tags`
 - [ ] watch GitHub Actions
-- [ ] `python3 -m build`  (TODO: test these steps starting here!)
-- [ ] `tar tzvf dist/re_int_ineq-*.tar.gz` to inspect the package
-- [ ] `dev/isolated-test.sh dist/re_int_ineq-*.tar.gz`
-- [ ] `twine upload dist/re_int_ineq-*.tar.gz`
+- [ ] `python3 -m build`
+- [ ] `twine check dist/re-int-ineq-*.tar.gz`
+- [ ] `tar tzvf dist/re-int-ineq-*.tar.gz` to inspect the package
+  - TODO Later: `tests/test_re_int_ineq.py` is being included, but `testcases.json` not. It's probably better
+    to exclude them both, but I haven't yet figured out how I can do that (or include `testcases.json`).
+- [ ] `dev/isolated-test.sh dist/re-int-ineq-*.tar.gz`
+- [ ] `twine upload dist/re-int-ineq-*.tar.gz`
 - [ ] New GitHub Release:
   Title "re-int-ineq vX.X.X", body from the changelog reformatted as Markdown,
   link to PyPI (specific version); attach `.tar.gz` to release
-- [ ] `pip3 install --update re-int-ineq` and `re-int-ineq -n lt 3`
+- [ ] `pip3 install --upgrade re-int-ineq` and `re-int-ineq -n lt 3`
 - [ ] `git clean -dxf dist *.egg-info`
 - [ ] Add placeholder for next version to `CHANGELOG.rst`

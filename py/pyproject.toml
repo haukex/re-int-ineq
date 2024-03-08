@@ -24,6 +24,9 @@ classifiers = [
     "Topic :: Software Development :: Code Generators",
 ]
 
+[tool.setuptools]
+packages = ["re_int_ineq"]
+
 [project.scripts]
 re-int-ineq = "re_int_ineq:main"
 

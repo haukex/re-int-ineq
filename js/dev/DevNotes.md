@@ -38,8 +38,9 @@ Releasing
 ---------
 
 - [ ] `git commit` and `git push` if needed
-- [ ] `git tag vX.X.X`
+- [ ] `git tag js-vX.X.X`
+  - [ ] **If** making a simultaneous release of all ports, see `/pl/DevNotes.md`!
 - [ ] `git push --tags`
 - [ ] watch GitHub Actions
-- [ ] `npm publish` TODO: untested
+- [ ] `npm publish`
 - [ ] Add placeholder for next version to `CHANGELOG.md`

@@ -5,3 +5,5 @@ __pycache__/
 coverage.xml
 htmlcov/
 /node_modules/
+/dist/
+/*.egg-info/

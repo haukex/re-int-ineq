@@ -1,7 +1,7 @@
 ## To get help on this makefile, run `make help`.
 # https://www.gnu.org/software/make/manual/make.html
 
-py_code_locs = ./*.py tests dev/*.py
+py_code_locs = re_int_ineq tests dev/*.py
 # Remember to keep in sync with GitHub Actions workflows:
 requirement_txts = dev/requirements.txt
 perm_checks = ./* .gitignore .vscode
