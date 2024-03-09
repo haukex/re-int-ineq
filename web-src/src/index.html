@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Regular Expression Integer Inequalities</title>
+  <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    integrity="sha256-9kPW/n5nn53j4WMRYAxe9c1rCY96Oogo/MKSVdKzPmI=" crossorigin="anonymous">
+  <style>
+    /* A few tweaks to reduce some of the vertical space (margins/padding) on mobile */
+    @media only screen and (max-width: 720px) {  /* same condition as simple.css uses */
+        body > header { padding-bottom: .5rem }
+        section:first-child { margin-top: 1rem }
+        body > footer { margin-top: 1rem; padding-top: 1rem }
+    }
+    /* borrow a few classes from Bootstrap */
+    .text-danger { color: rgb(220, 53, 69) }
+    .text-success { color: rgb(25, 135, 84) }
+    .text-info-emphasis { color: rgb(5, 81, 96) }
+    @media (prefers-color-scheme: dark) {
+      .text-info-emphasis { color: rgb(110, 223, 246) }
+    }
+    .d-none { display: none }
+    /* custom */
+    #regexp, #extract_out {
+      display: inline-block;
+      width: 100%;
+      background-color: var(--accent-bg);
+      border: 1px solid var(--border); /*var(--accent);*/
+      padding: 0.7rem 1rem;
+    }
+  </style>
+  <script type="module">import "./main.ts";</script> <!-- parcel will inline and minify this -->
+</head>
+<body>
+
+  <header>
+    <h1>Regular Expression Integer Inequalities</h1>
+    <p> &bull;
+      Powered by <code>re-int-ineq</code> &bull;
+      <a href="https://metacpan.org/pod/Regexp::IntInequality" target="_blank">Perl</a> &bull;
+      <a href="https://pypi.org/project/re-int-ineq/" target="_blank">Python</a> &bull;
+      <a href="https://www.npmjs.com/package/re-int-ineq" target="_blank">JavaScript</a> &bull;
+    </p>
+  </header>
+
+  <main>
+
+    <section>
+      <noscript>
+        <div class="notice">⚠️ This requires JavaScript.</div>
+      </noscript>
+      <article>
+        <header><h2>Generate</h2></header>
+        <div>
+          <label for="operator">Operator</label>
+          <select id="operator">
+            <option value="&gt;" selected>&gt;</option>
+            <option value="&gt;=">&ge;</option>
+            <option value="&lt;">&lt;</option>
+            <option value="&lt;=">&le;</option>
+            <option value="==">&equals;</option>
+            <option value="!=">&ne;</option>
+          </select>
+          <label for="integer">Integer</label>
+          <input id="integer" type="number" step="1" pattern="-?[0-9]+" value="42">
+          <label>
+            <input id="allint" type="checkbox">
+            All integers <small>(include negative)</small>
+          </label>
+          <label>
+            <input id="anchor" type="checkbox" checked>
+            Regexp anchors <small>(recommended)</small>
+          </label>
+        </div>
+        <div id="errormsg" class="d-none text-danger" style="margin-top: 1rem"></div>
+        <div style="margin-top: 1rem">Regexp:</div>
+        <code id="regexp"></code>
+      </article>
+    </section>
+
+    <section>
+      <article>
+        <header><h2>Test</h2></header>
+        <div>
+          <label for="exactmatch">Exact Match <span id="exactresult"></span></label>
+          <input id="exactmatch" type="text" value="47">
+          <hr>
+          <label for="extract_inp">Extract Integers</label>
+          <textarea id="extract_inp" rows="8" cols="48"
+            placeholder="Text from which to extract integers">Do you know why 23, 74, and 47 are special? And what about 42?</textarea>
+          <div>Matches:</div>
+          <code id="extract_out">(none)</code>
+        </div>
+        </article>
+    </section>
+
+  </main>
+
+  <footer>
+    <p><a class="bi-github" href="https://github.com/haukex/re-int-ineq" target="_blank">&nbsp;Source Code on GitHub</a></p>
+    <p>Copyright &copy; 2024 <a href="https://www.zero-g.net/" target="_blank">Hauke Dämpfling</a>.
+      License: <a href="https://www.gnu.org/licenses/lgpl-3.0-standalone.html" target="_blank">GNU LGPL 3.0+</a></p>
+  </footer>
+
+</body>
+</html>
