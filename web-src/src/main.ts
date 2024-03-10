@@ -34,18 +34,18 @@ window.addEventListener('DOMContentLoaded', () => {
       exactmatch.classList.remove('text-danger')
       exactresult.classList.add('bi-check-lg','text-success')
       exactresult.classList.remove('bi-x-lg','text-danger')
-      exactresult.innerText = '\u00A0Matches Exactly'
+      exactresult.innerText = '\u00A0Entire string matches'
     }
     else {
       exactmatch.classList.add('text-danger')
       exactmatch.classList.remove('text-success')
       exactresult.classList.add('bi-x-lg','text-danger')
       exactresult.classList.remove('bi-check-lg','text-success')
-      exactresult.innerText = '\u00A0Doesn\'t Match Exactly'
+      exactresult.innerText = '\u00A0Entire string doesn\'t match'
     }
     const matches = [...(extract_inp.value).matchAll(new RegExp(re,'g'))].map((m)=>m[0])
     if (matches.length) extract_out.innerText = matches.join('\n')
-    else extract_out.innerText = '(none)'
+    else extract_out.innerText = '(no matches)'
   }
   operator.addEventListener('change', do_upd)
   integer.addEventListener('change', do_upd)

@@ -17,6 +17,7 @@
     /* borrow a few classes from Bootstrap */
     .text-danger { color: rgb(220, 53, 69) }
     .text-success { color: rgb(25, 135, 84) }
+    .text-secondary { color: rgb(108, 117, 125) }
     .text-info-emphasis { color: rgb(5, 81, 96) }
     @media (prefers-color-scheme: dark) {
       .text-info-emphasis { color: rgb(110, 223, 246) }
@@ -66,11 +67,11 @@
         <div style="display:flex;flex-flow:row wrap;gap:1rem">
           <label>
             <input id="allint" type="checkbox">
-            All integers <small>(include negative)</small>
+            All integers <small class="text-secondary">(include negative)</small>
           </label>
           <label>
             <input id="anchor" type="checkbox" checked>
-            Regexp anchors <small>(recommended)</small>
+            Regexp anchors <small class="text-secondary">(recommended)</small>
           </label>
         </div>
         <div id="errormsg" class="d-none bi-x-octagon text-danger" style="margin-top: 1rem"></div>
@@ -87,16 +88,21 @@
       <article>
         <header><h2>Test</h2></header>
         <div>
-          <label for="exactmatch" id="exactresult">&nbsp;Exact Match</label>
+          <label for="exactmatch" id="exactresult">&nbsp;Full String Match</label>
           <input id="exactmatch" type="text" value="47">
-          <hr>
+          <div><small class="text-secondary">Does the regular expression match this <i>entire</i> string exactly,
+            not just a substring?</small></div>
+        </div>
+        <hr>
+        <div>
           <label for="extract_inp">Extract Integers</label>
           <textarea id="extract_inp" rows="8" cols="40" style="width:100%"
             placeholder="Text from which to extract integers">Do you know why 23, 74, and 47 are special? And what about 42?</textarea>
-          <div>Matches:</div>
-          <pre><code id="extract_out">(none)</code></pre>
+          <div><small class="text-secondary">The regular expression will be used to extract all matching integers
+            from this text and shown here.</small></div>
+          <pre><code id="extract_out">(no matches)</code></pre>
         </div>
-        </article>
+      </article>
     </section>
 
   </main>
