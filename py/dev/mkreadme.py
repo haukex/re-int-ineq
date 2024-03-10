@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 from pathlib import Path
 from textwrap import dedent
 import re_int_ineq
@@ -9,7 +10,9 @@ def main():
     assert isinstance(re_int_ineq.__doc__, str) and isinstance(re_int_ineq.re_int_ineq.__doc__, str)
     mdoc = re_int_ineq.__doc__
     fdoc = dedent(re_int_ineq.re_int_ineq.__doc__)
-    mdoc1, mdoc2, mdoc3 = mdoc.partition("Author, Copyright, and License\n")
+    fdoc = fdoc.replace(':return:',':Returns:').replace(':rtype:',':Return Type:')
+    fdoc = re.sub(r'^:param\s+(\w+)\s+(\w+):', lambda m: f":Parameter ``{m[2]} :{m[1]}``:", fdoc, flags=re.M)
+    mdoc1, mdoc2, mdoc3 = mdoc.partition("Command-Line Interface\n")
     assert mdoc3
     with (Path(__file__).parent.parent/'README.rst').open('w', encoding='utf-8') as fh:
         print(mdoc1.removeprefix("\n"), file=fh, end='')

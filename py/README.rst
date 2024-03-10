@@ -18,35 +18,6 @@ The generated regular expressions are valid in Perl, Python, and JavaScript
 ES2018 or later, and probably in other languages that support lookaround
 assertions with the same syntax.
 
-Command-Line Interface
-----------------------
-
-This module provides a command-line interface script, also named
-``re-int-ineq``::
-
-    usage: re-int-ineq [-h] [-n] [-A] {lt,le,gt,ge,ne,eq,<,<=,>,>=,!=,==} n
-
-    Regular Expression Integer Inequalities
-
-    positional arguments:
-    {lt,le,gt,ge,ne,eq,<,<=,>,>=,!=,==}
-                          the operator to implement
-    n                     the integer to compare against
-
-    options:
-    -h, --help            show this help message and exit
-    -n, --allint          match all integers, including negative
-    -A, --no-anchor       don't add anchors to regex
-
-See Also
---------
-
-- **Perl version:** https://metacpan.org/pod/Regexp::IntInequality
-
-- **JavaScript port:** https://www.npmjs.com/package/re-int-ineq
-
-- **Web interface:** https://haukex.github.io/re-int-ineq/
-
 ``re_int_ineq``
 ---------------
 
@@ -72,14 +43,14 @@ Note the regular expressions will grow significantly the more digits are in
 the integer. I suggest not to generate regular expressions from unbounded
 user input.
 
-:param str op: The operator the regex should implement, one of ``">"``,
+:Parameter ``op :str``: The operator the regex should implement, one of ``">"``,
     ``">="``, ``"<"``, ``"<="``, ``"!="``, or ``"=="`` (the latter is
     provided simply for completeness, despite the name of this module).
 
-:param int n: The integer against which the regex should compare.
+:Parameter ``n :int``: The integer against which the regex should compare.
     May only be negative when ``allint`` is true.
 
-:param bool allint: If ``False`` (the default), the generated regex will
+:Parameter ``allint :bool``: If ``False`` (the default), the generated regex will
     only cover positive integers and zero, and ``n`` may not be negative.
     **Note** that in this case, any minus signs before integers are not
     included in the regex. This means that when using the regex, for
@@ -91,7 +62,7 @@ user input.
     generated regexes that match zero will also match ``"-0"`` and vice
     versa.
 
-:param bool anchor: This is ``True`` by default, meaning the regex will
+:Parameter ``anchor :bool``: This is ``True`` by default, meaning the regex will
     have zero-width assertions (a.k.a. anchors) surrounding the expression
     in order to prevent matches inside of integers. For example, when
     extracting integers less than 20 from the string ``"1199 32 5"``, the
@@ -120,10 +91,39 @@ user input.
     ``"3"``, ``"2"``, and ``"5"`` - so use this feature with caution and
     testing!
 
-:return: The regular expression. It is returned as a string rather than a
+:Returns: The regular expression. It is returned as a string rather than a
     precompiled regex so it can more easily be embedded in larger
     expressions.
-:rtype: str
+:Return Type: str
+
+Command-Line Interface
+----------------------
+
+This module provides a command-line interface script, also named
+``re-int-ineq``::
+
+    usage: re-int-ineq [-h] [-n] [-A] {lt,le,gt,ge,ne,eq,<,<=,>,>=,!=,==} n
+
+    Regular Expression Integer Inequalities
+
+    positional arguments:
+    {lt,le,gt,ge,ne,eq,<,<=,>,>=,!=,==}
+                          the operator to implement
+    n                     the integer to compare against
+
+    options:
+    -h, --help            show this help message and exit
+    -n, --allint          match all integers, including negative
+    -A, --no-anchor       don't add anchors to regex
+
+See Also
+--------
+
+- **Perl version:** https://metacpan.org/pod/Regexp::IntInequality
+
+- **JavaScript port:** https://www.npmjs.com/package/re-int-ineq
+
+- **Web interface:** https://haukex.github.io/re-int-ineq/
 
 Author, Copyright, and License
 ------------------------------

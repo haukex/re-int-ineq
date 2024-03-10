@@ -32,6 +32,7 @@ Release Preparation
   - [ ] Whether the Python versions in `dev/local-actions.sh` and the GitHub Actions Workflows need updating
 - [ ] Spellcheck documentation in `re_int_ineq/__init__.py`
 - [ ] `PYTHONPATH=. dev/mkreadme.py` - generate `README.rst`
+- [ ] `rst2html README.rst readme.html` - check rendering
 - [ ] Bump version number in `pyproject.toml`
 - [ ] Update `CHANGELOG.rst` (reference: <https://github.com/pypa/packaging/blob/main/CHANGELOG.rst>)
 
