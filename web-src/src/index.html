@@ -49,7 +49,7 @@
 
     <section>
       <noscript>
-        <div class="notice">⚠️ This requires JavaScript.</div>
+        <div class="notice bi-exclamation-triangle text-danger">&nbsp;This requires JavaScript.</div>
       </noscript>
       <article>
         <header><h2>Generate</h2></header>
@@ -74,7 +74,7 @@
             Regexp anchors <small>(recommended)</small>
           </label>
         </div>
-        <div id="errormsg" class="d-none text-danger" style="margin-top: 1rem"></div>
+        <div id="errormsg" class="d-none bi-x-octagon text-danger" style="margin-top: 1rem"></div>
         <div style="margin-top: 1rem">Regexp:</div>
         <code id="regexp"></code>
       </article>
@@ -84,7 +84,7 @@
       <article>
         <header><h2>Test</h2></header>
         <div>
-          <label for="exactmatch">Exact Match <span id="exactresult"></span></label>
+          <label for="exactmatch" id="exactresult">&nbsp;Exact Match</label>
           <input id="exactmatch" type="text" value="47">
           <hr>
           <label for="extract_inp">Extract Integers</label>

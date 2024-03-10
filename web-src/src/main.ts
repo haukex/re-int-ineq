@@ -19,7 +19,7 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       re = re_int_ineq(operator.value, integer.valueAsNumber, allint.checked, anchor.checked)
     } catch (ex) {
-      errormsg.innerText = '❌ ' + ex
+      errormsg.innerText = '\u00A0' + ex
       errormsg.classList.remove('d-none')
       return
     }
@@ -29,12 +29,16 @@ window.addEventListener('DOMContentLoaded', () => {
     if ( new RegExp('^'+re+'$').test(exactmatch.value) ) {
       exactmatch.classList.add('text-success')
       exactmatch.classList.remove('text-danger')
-      exactresult.innerText = '✔️'
+      exactresult.classList.add('bi-check-lg','text-success')
+      exactresult.classList.remove('bi-x-lg','text-danger')
+      exactresult.innerText = '\u00A0Matches Exactly'
     }
     else {
       exactmatch.classList.add('text-danger')
       exactmatch.classList.remove('text-success')
-      exactresult.innerText = '❌'
+      exactresult.classList.add('bi-x-lg','text-danger')
+      exactresult.classList.remove('bi-check-lg','text-success')
+      exactresult.innerText = '\u00A0Doesn\'t Match Exactly'
     }
     const matches = [...(extract_inp.value).matchAll(new RegExp(re,'g'))].map((m)=>m[0])
     if (matches.length) extract_out.innerText = matches.join('\n')
