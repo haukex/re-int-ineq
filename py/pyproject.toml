@@ -30,7 +30,8 @@ packages = ["re_int_ineq"]
 re-int-ineq = "re_int_ineq:main"
 
 [project.urls]
-"Homepage" = "https://github.com/haukex/re-int-ineq"
+"Homepage" = "https://haukex.github.io/re-int-ineq/"
+"Repository" = "https://github.com/haukex/re-int-ineq"
 "Bug Tracker" = "https://github.com/haukex/re-int-ineq/issues"
 
 

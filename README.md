@@ -27,3 +27,5 @@ The modules are published at:
   (includes a command-line interface)
 
 - **JavaScript port:** <https://www.npmjs.com/package/re-int-ineq>
+
+- **Web interface:** <https://haukex.github.io/re-int-ineq/>

@@ -16,7 +16,7 @@ WriteMakefile(
 			},
 		},
 		resources => {
-			homepage => 'https://github.com/haukex/re-int-ineq',
+			homepage => 'https://haukex.github.io/re-int-ineq/',
 			repository => {
 				type => 'git',
 				url  => 'https://github.com/haukex/re-int-ineq.git',

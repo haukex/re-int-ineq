@@ -322,6 +322,10 @@ L<https://pypi.org/project/re-int-ineq/>
 
 L<https://www.npmjs.com/package/re-int-ineq>
 
+=item Web interface
+
+L<https://haukex.github.io/re-int-ineq/>
+
 =back
 
 =head1 Author, Copyright, and License

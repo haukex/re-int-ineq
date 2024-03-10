@@ -26,6 +26,8 @@ See Also
 
 - **JavaScript port:** https://www.npmjs.com/package/re-int-ineq
 
+- **Web interface:** https://haukex.github.io/re-int-ineq/
+
 Author, Copyright, and License
 ------------------------------
 
