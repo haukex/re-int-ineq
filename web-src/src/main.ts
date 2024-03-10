@@ -14,8 +14,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const exactresult = document.getElementById('exactresult') as HTMLElement
   const extract_inp = document.getElementById('extract_inp') as HTMLInputElement
   const extract_out = document.getElementById('extract_out') as HTMLElement
+  const btn_copy    = document.getElementById('btn_copy'   ) as HTMLElement
+  const copied      = document.getElementById('copied'     ) as HTMLElement
+  let re = ''
   const do_upd = () => {
-    let re
     try {
       re = re_int_ineq(operator.value, integer.valueAsNumber, allint.checked, anchor.checked)
     } catch (ex) {
@@ -26,6 +28,7 @@ window.addEventListener('DOMContentLoaded', () => {
     errormsg.innerText = ''
     errormsg.classList.add('d-none')
     regexp.innerText = re
+    copied.classList.add('d-none')
     if ( new RegExp('^'+re+'$').test(exactmatch.value) ) {
       exactmatch.classList.add('text-success')
       exactmatch.classList.remove('text-danger')
@@ -51,4 +54,8 @@ window.addEventListener('DOMContentLoaded', () => {
   exactmatch.addEventListener('change', do_upd)
   extract_inp.addEventListener('change', do_upd)
   do_upd()
+  btn_copy.addEventListener('click', () => {
+    navigator.clipboard.writeText(re)
+    copied.classList.remove('d-none')
+  })
 })
