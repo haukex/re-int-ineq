@@ -2,14 +2,20 @@ Regular Expression Integer Inequalities: Regexp::IntInequality
 ==============================================================
 
 This is the distribution of the Perl module
-[`Regexp::IntInequality`](https://metacpan.org/pod/Regexp::IntInequality).
-
-It is a Perl extension for generating regular expressions to match integers
+[`Regexp::IntInequality`](https://metacpan.org/pod/Regexp::IntInequality),
+a Perl extension for generating regular expressions to match integers
 greater than / less than / etc. a value.
 
-Please see the module's documentation (POD) for details (try the command
-`perldoc lib/Regexp/IntInequality.pm`) and the file `Changes` for version
-information.
+Documentation
+-------------
+
+The documentation of the most recent release is rendered at
+<https://metacpan.org/pod/Regexp::IntInequality>.
+
+The documentation is stored as Plain Old Documentation (POD) in the
+module's code - try the command `perldoc lib/Regexp/IntInequality.pm`.
+
+See the file `Changes` for version information.
 
 Installation
 ------------
