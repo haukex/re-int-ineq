@@ -4,10 +4,6 @@ on:
   push:
     paths:
       - 'pl/**'
-    # since this already fires for each push, no need to fire for tags too:
-    #tags-ignore: '**'
-    # TODO: I think this now casued the workflow to not run at all? I guess
-    # I need to read up on actions a bit more.
   pull_request:
     paths:
       - 'pl/**'

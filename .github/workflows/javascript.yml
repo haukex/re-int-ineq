@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'js/**'
-    #TODO Later: I think this workflow will also fire for any tags, which seems a bit wasteful?
   pull_request:
     paths:
       - 'js/**'
