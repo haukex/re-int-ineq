@@ -27,6 +27,8 @@ See Also
 **Python port:** <https://pypi.org/project/re-int-ineq/>
 (includes a command-line interface)
 
+**Web interface:** <https://haukex.github.io/re-int-ineq/>
+
 Author, Copyright and License
 -----------------------------
 

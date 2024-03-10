@@ -18,12 +18,34 @@ The generated regular expressions are valid in Perl, Python, and JavaScript
 ES2018 or later, and probably in other languages that support lookaround
 assertions with the same syntax.
 
+Command-Line Interface
+----------------------
+
+This module provides a command-line interface script, also named
+``re-int-ineq``::
+
+    usage: re-int-ineq [-h] [-n] [-A] {lt,le,gt,ge,ne,eq,<,<=,>,>=,!=,==} n
+
+    Regular Expression Integer Inequalities
+
+    positional arguments:
+    {lt,le,gt,ge,ne,eq,<,<=,>,>=,!=,==}
+                          the operator to implement
+    n                     the integer to compare against
+
+    options:
+    -h, --help            show this help message and exit
+    -n, --allint          match all integers, including negative
+    -A, --no-anchor       don't add anchors to regex
+
 See Also
 --------
 
 - **Perl version:** https://metacpan.org/pod/Regexp::IntInequality
 
 - **JavaScript port:** https://www.npmjs.com/package/re-int-ineq
+
+- **Web interface:** https://haukex.github.io/re-int-ineq/
 
 ``re_int_ineq``
 ---------------
