@@ -84,21 +84,19 @@ const _ANY_ZN = new Set( [...Array(8).keys()].map((i)=>`-[0-${i+2}]`).concat('-[
  * @param n - The integer against which the regex should compare.
  *   May only be negative when `allint` is true.
  *
- * @param allint - If `false` (the default), the generated regex will only
+ * @param allint - <p>If `false` (the default), the generated regex will only
  *   cover positive integers and zero, and `n` may not be negative. **Note**
  *   that in this case, any minus signs before integers are not included in the
  *   regex. This means that when using the regex, for example, to extract
  *   integers greater than 10 from the string `"3 5 15 -7 -12"`, it will match
- *   `"15"` **and** `"12"`!
+ *   `"15"` **and** `"12"`!</p>
  *
- *   —•—
- *
- *   If ``True``, the generated regex will cover all integers, including
+ *   <p>If ``True``, the generated regex will cover all integers, including
  *   negative, and ``integer`` may also be any integer. Note that all
  *   generated regexes that match zero will also match ``"-0"`` and vice
- *   versa.
+ *   versa.</p>
  *
- * @param anchor - This is `true` by default, meaning the regex will have
+ * @param anchor - <p>This is `true` by default, meaning the regex will have
  *   zero-width assertions (a.k.a. anchors) surrounding the expression in order
  *   to prevent matches inside of integers. For example, when extracting
  *   integers less than 20 from the string `"1199 32 5"`, the generated regex
@@ -106,27 +104,23 @@ const _ANY_ZN = new Set( [...Array(8).keys()].map((i)=>`-[0-${i+2}]`).concat('-[
  *   only match `"5"`. On the other hand, any non-digit characters (including
  *   minus signs) are considered delimiters: extracting all integers less than
  *   5 from the string `"2x3-3-24y25"` with `allint` turned on will result in
- *   `"2"`, `"3"`, `"-3"`, and `"-24"`.
+ *   `"2"`, `"3"`, `"-3"`, and `"-24"`.</p>
  *
- *   —•—
- *
- *   This behavior is useful if you are extracting numbers from a longer
+ *   <p>This behavior is useful if you are extracting numbers from a longer
  *   string. If you want to validate that a string contains *only* an integer,
  *   then you will need to add additional anchors. For example, you might add
  *   `^` before the generated regex and `$` after, keeping in mind not to turn
  *   on the `multiline` (`m`) flag, as that changes the meaning of these
  *   anchors. However, this task is more commonly done by first checking that
  *   the string is a valid integer in general, and then using normal numeric
- *   comparisons to check that it is in the range you expect.
+ *   comparisons to check that it is in the range you expect.</p>
  *
- *   —•—
- *
- *   If on the other hand you want to turn off the default anchors described
+ *   <p>If on the other hand you want to turn off the default anchors described
  *   above, perhaps because you want to implement your own, then you can set
  *   this option to `false`. Repeating the above example, extracting integers
  *   less than 20 from the string `"1199 32 5"` with this option off and no
  *   additional anchors results in `"11"`, `"9"`, `"9"`, `"3"`, `"2"`, and
- *   `"5"` - so use this feature with caution and testing!
+ *   `"5"` - so use this feature with caution and testing!</p>
  *
  * @returns The regular expression. It is returned as a string rather than a
  *   precompiled regex so it can more easily be embedded in larger expressions.
