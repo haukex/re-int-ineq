@@ -1,5 +1,5 @@
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
-name: Perl Basic Tests (only)
+name: Basic Perl Tests
 on:
   push:
     paths:

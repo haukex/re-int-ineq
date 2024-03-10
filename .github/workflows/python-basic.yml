@@ -1,5 +1,5 @@
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
-name: Python Tests, Lint, and Coverage
+name: Basic Python Tests, Lint, and Coverage
 on:
   push:
     paths:
