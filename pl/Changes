@@ -1,4 +1,7 @@
 Revision history for Perl extension Regexp::IntInequality.
 
-0.90	Fri, Mar  8 2024
+1.00	unreleased
+	- Documentation updates
+
+0.90	Fri, Mar  8 2024	commit d397be463f165148ca9836f7931a656f8a7a414c
 	- Initial release
