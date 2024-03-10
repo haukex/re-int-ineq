@@ -45,18 +45,24 @@
       </noscript>
       <article>
         <header><h2>Generate</h2></header>
-        <div>
-          <label for="operator">Operator</label>
-          <select id="operator">
-            <option value="&gt;" selected>&gt;</option>
-            <option value="&gt;=">&ge;</option>
-            <option value="&lt;">&lt;</option>
-            <option value="&lt;=">&le;</option>
-            <option value="==">&equals;</option>
-            <option value="!=">&ne;</option>
-          </select>
-          <label for="integer">Integer</label>
-          <input id="integer" type="number" step="1" pattern="-?[0-9]+" value="42">
+        <div style="display:flex;flex-flow:row wrap;gap:1rem">
+          <div>
+            <label for="operator">Operator</label>
+            <select id="operator">
+              <option value="&gt;" selected>&gt;</option>
+              <option value="&gt;=">&ge;</option>
+              <option value="&lt;">&lt;</option>
+              <option value="&lt;=">&le;</option>
+              <option value="==">&equals;</option>
+              <option value="!=">&ne;</option>
+            </select>
+          </div>
+          <div>
+            <label for="integer">Integer</label>
+            <input id="integer" type="number" step="1" pattern="-?[0-9]+" size=10 value="42">
+          </div>
+        </div>
+        <div style="display:flex;flex-flow:row wrap;gap:1rem">
           <label>
             <input id="allint" type="checkbox">
             All integers <small>(include negative)</small>
@@ -67,12 +73,10 @@
           </label>
         </div>
         <div id="errormsg" class="d-none bi-x-octagon text-danger" style="margin-top: 1rem"></div>
-        <div style="margin-top: 1rem">
-          <b>Regexp</b>
-          <small>
-            <button id="btn_copy" class="bi-clipboard" style="margin-left:2rem">&nbsp;Copy</button>
-            <i id="copied" class="d-none" style="margin-left:0.5rem">Copied!</i>
-          </small>
+        <hr>
+        <div style="display:flex;flex-flow:row wrap;gap:1rem;justify-content:space-between">
+          <b style="align-self:center">Regexp</b>
+          <small><button id="btn_copy" class="bi-clipboard">&nbsp;Copy</button></small>
         </div>
         <pre><code id="regexp"></code></pre>
       </article>
@@ -86,7 +90,7 @@
           <input id="exactmatch" type="text" value="47">
           <hr>
           <label for="extract_inp">Extract Integers</label>
-          <textarea id="extract_inp" rows="8" cols="48"
+          <textarea id="extract_inp" rows="8" cols="40" style="width:100%"
             placeholder="Text from which to extract integers">Do you know why 23, 74, and 47 are special? And what about 42?</textarea>
           <div>Matches:</div>
           <pre><code id="extract_out">(none)</code></pre>

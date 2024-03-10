@@ -15,7 +15,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const extract_inp = document.getElementById('extract_inp') as HTMLInputElement
   const extract_out = document.getElementById('extract_out') as HTMLElement
   const btn_copy    = document.getElementById('btn_copy'   ) as HTMLElement
-  const copied      = document.getElementById('copied'     ) as HTMLElement
   let re = ''
   const do_upd = () => {
     try {
@@ -28,7 +27,8 @@ window.addEventListener('DOMContentLoaded', () => {
     errormsg.innerText = ''
     errormsg.classList.add('d-none')
     regexp.innerText = re
-    copied.classList.add('d-none')
+    btn_copy.classList.add('bi-clipboard')
+    btn_copy.classList.remove('bi-clipboard-check-fill')
     if ( new RegExp('^'+re+'$').test(exactmatch.value) ) {
       exactmatch.classList.add('text-success')
       exactmatch.classList.remove('text-danger')
@@ -56,6 +56,7 @@ window.addEventListener('DOMContentLoaded', () => {
   do_upd()
   btn_copy.addEventListener('click', () => {
     navigator.clipboard.writeText(re)
-    copied.classList.remove('d-none')
+    btn_copy.classList.add('bi-clipboard-check-fill')
+    btn_copy.classList.remove('bi-clipboard')
   })
 })
