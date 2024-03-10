@@ -14,7 +14,7 @@ test:
 
 .PHONY: clean
 clean:
-	rm -rvf dist
+	git clean -dxf dist
 
 .PHONY: installdeps
 installdeps:
