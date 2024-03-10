@@ -22,14 +22,6 @@
       .text-info-emphasis { color: rgb(110, 223, 246) }
     }
     .d-none { display: none }
-    /* custom */
-    #regexp, #extract_out {
-      display: inline-block;
-      width: 100%;
-      background-color: var(--accent-bg);
-      border: 1px solid var(--border); /*var(--accent);*/
-      padding: 0.7rem 1rem;
-    }
   </style>
   <script type="module">import "./main.ts";</script> <!-- parcel will inline and minify this -->
 </head>
@@ -76,7 +68,7 @@
         </div>
         <div id="errormsg" class="d-none bi-x-octagon text-danger" style="margin-top: 1rem"></div>
         <div style="margin-top: 1rem">Regexp:</div>
-        <code id="regexp"></code>
+        <pre><code id="regexp"></code></pre>
       </article>
     </section>
 
@@ -91,7 +83,7 @@
           <textarea id="extract_inp" rows="8" cols="48"
             placeholder="Text from which to extract integers">Do you know why 23, 74, and 47 are special? And what about 42?</textarea>
           <div>Matches:</div>
-          <code id="extract_out">(none)</code>
+          <pre><code id="extract_out">(none)</code></pre>
         </div>
         </article>
     </section>
