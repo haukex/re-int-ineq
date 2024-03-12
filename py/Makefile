@@ -6,6 +6,9 @@ py_code_locs = re_int_ineq tests dev/*.py
 requirement_txts = dev/requirements.txt
 perm_checks = ./* .gitignore .vscode
 
+# Remember venv only sets up the `python3` alias if it was called from `python3`,
+# so it's generally more reliable to call `python` instead, though on some old
+# systems that may still refer to Python 2 (`sudo apt-get install python-is-python3`).
 PYTHON3BIN = python  # user can change this on the `make` command line
 
 .PHONY: help tasklist installdeps test
@@ -27,6 +30,7 @@ installdeps:  ## Install project dependencies
 	@set -euxo pipefail
 	$(PYTHON3BIN) -m pip install --upgrade --upgrade-strategy=eager --no-warn-script-location pip wheel
 	$(PYTHON3BIN) -m pip install --upgrade --upgrade-strategy=eager --no-warn-script-location $(foreach x,$(requirement_txts),-r $(x))
+	pre-commit install -c dev/pre-commit.yml
 	# for modules/packages:
 	# $(PYTHON3BIN) -m pip install --editable .
 	npm ci
@@ -51,7 +55,7 @@ nix-checks:  ## Checks that depend on a *NIX OS/FS
 			UNRELIABLE_PERMS=""
 			set -x
 			simple-perms $(perm_checks)  # if this errors, run `simple-perms -m ...` for auto fix
-			test -z "$$(find . -iname '*.sh' ! -executable)"
+			test -z "$$( find . \( -type d -name '.venv*' -prune \) -o \( -iname '*.sh' ! -executable -print \) )"
 		fi
 	fi
 	py-check-script-vs-lib $${UNRELIABLE_PERMS:+"--exec-git"} --notice $(py_code_locs)
@@ -61,7 +65,7 @@ nix-checks:  ## Checks that depend on a *NIX OS/FS
 shellcheck:  ## Run shellcheck
 	@set -euxo pipefail
 	# https://www.gnu.org/software/findutils/manual/html_mono/find.html
-	find . -iname '*.sh' -exec shellcheck '{}' +
+	find . \( -type d -name '.venv*' -prune \) -o \( -iname '*.sh' -exec shellcheck '{}' + \)
 
 ver-checks:  ## Checks that depend on the Python version
 	@set -euxo pipefail
@@ -74,6 +78,7 @@ ver-checks:  ## Checks that depend on the Python version
 
 other-checks:  ## Checks not depending on the Python version
 	@set -euxo pipefail
+	pre-commit run -c dev/pre-commit.yml --all-files
 	# note the following is on one line b/c GitHub macOS Action Runners are running bash 3.2 and the multiline version didn't work there...
 	for REQ in $(requirement_txts); do pur --dry-run-changed --nonzero-exit-code -r "$$REQ"; done
 
