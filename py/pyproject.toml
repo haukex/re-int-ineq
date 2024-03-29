@@ -39,7 +39,7 @@ re-int-ineq = "re_int_ineq:main"
 # pylance: ``# pyright: ignore [settingName]``
 # pylint:  ``# pylint: disable=setting-name``
 # flake8:  ``# noqa: CODE``
-# mypy:    ``# type: ignore``
+# mypy:    ``# type: ignore [setting-name]``
 
 # ##### ##### ##### ##### ##### https://github.com/microsoft/pyright/blob/main/docs/configuration.md ##### ##### ##### ##### #####
 
