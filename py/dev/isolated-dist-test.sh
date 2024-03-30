@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euxo pipefail
-# Must pass filename for pip to install as first argument
+
+##### Test distribution in an isolated environment
+# This test takes a built .tar.gz distribution (must be passed as first argument)
+# and runs the test suite on it in an isolated venv.
+###
+
 test -n "$1"
 DISTFILE="$(realpath "$1")"
 test -f "$DISTFILE"

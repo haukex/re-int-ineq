@@ -51,7 +51,7 @@ Releasing
 - [ ] `tar tzvf dist/re-int-ineq-*.tar.gz` to inspect the package
   - TODO Later: `tests/test_re_int_ineq.py` is being included, but `testcases.json` not. It's probably better
     to exclude them both, but I haven't yet figured out how I can do that (or include `testcases.json`).
-- [ ] `dev/isolated-test.sh dist/re-int-ineq-*.tar.gz`
+- [ ] `dev/isolated-dist-test.sh dist/re-int-ineq-*.tar.gz`
 - [ ] `twine upload dist/re-int-ineq-*.tar.gz`
 - [ ] New GitHub Release:
   Title "re-int-ineq vX.X.X", body from the changelog reformatted as Markdown,
