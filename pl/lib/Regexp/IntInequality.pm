@@ -90,13 +90,9 @@ versa.
 
 =head3 C<$anchor> and Anchoring
 
-If this argument is omitted, meaning if the function is called with two or
-three arguments, this option is on by default. However, if this argument is
-given explicitly, meaning the function is called with four arguments, then any
-true value turns on the option, while any false value, I<including> C<undef>,
-turns the option off. This is important to note because many other functions
-in Perl will make not make a distinction between omitting an argument and
-passing C<undef> for that argument.
+B<Note:> This option defaults to being on I<only> when the function is called
+with less than four arguments, otherwise the option is turned on by any true
+value and turned off by any false value, I<including> C<undef>.
 
 When this option is on (see explanation above), the regex will have zero-width
 assertions (a.k.a. anchors) surrounding the expression in order to prevent
