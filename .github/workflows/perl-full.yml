@@ -10,6 +10,9 @@ jobs:
     name: Perl ${{ matrix.perlver }} on Linux
     strategy:
       fail-fast: false
+      # Workaround for: "Failed to save: Unable to reserve cache with key ...,
+      # another job may be creating this cache. More details: Cache already exists."
+      # Now the total workflow is very slow, but at least it works correctly.
       max-parallel: 1
       matrix:
         perlver:
@@ -36,11 +39,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: cache-perl-modules
-        #TODO Later: "Failed to save: Unable to reserve cache with key
-        # bacba3f75e5318670eca90caa4c7704855902265278bb76da6439b4e664881ce,
-        # another job may be creating this cache. More details: Cache already exists."
-        # => a problem when all the jobs run in parallel I guess?
-        # I added `max-parallel: 1` above, let's see if that fixes it
         uses: actions/cache@v4
         with:
           path: /usr/src/perl-modules
