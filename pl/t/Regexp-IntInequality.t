@@ -48,27 +48,24 @@ subtest 'manual tests' => sub {
     my @TESTS = grep {ref} @{ $TESTCASES->{manual_tests} };
     plan tests => 0+@TESTS;
     for my $t (@TESTS)
-        { is re_int_ineq(@$t[0..3]), $$t[4], "$$t[0] $$t[1] "
-            .($$t[2]?'Z':'N').($$t[3]?'':' no anchor')." => $$t[4]" }
+        { is re_int_ineq(@$t[0..4]), $$t[5], "$$t[0] $$t[1] "
+            .($$t[2]?'Z':'N').($$t[3]?'anc':'!an').($$t[4]?'wz':'nz')." => $$t[5]" }
 } or BAIL_OUT("manual tests failed");
 
 subtest 'extraction' => sub {
     my @TESTS = grep {ref} @{ $TESTCASES->{extraction} };
     plan tests => 0+@TESTS;
     for my $t (@TESTS) {
-        my $re = re_int_ineq(@$t[0..3]);
-        my @got = $$t[4]=~/$re/g;
-        is_deeply \@got, [ @$t[5..$#$t] ], "extraction with $re"
+        my $re = re_int_ineq(@$t[0..4]);
+        my @got = $$t[5]=~/$re/g;
+        is_deeply \@got, [ @$t[6..$#$t] ], "extraction with $re"
             or diag explain [$t, $re, \@got];
     }
 } or BAIL_OUT("extraction tests failed");
 
-subtest 'zeroes' => sub {
-    my @NEVERMATCH = map {("0$_","00$_","-0$_","-00$_")}
-        @{ $TESTCASES->{zeroes_nevermatch} };
-    my @TESTS = @{ $TESTCASES->{zeroes} };
-    plan tests => (2+@NEVERMATCH)*@TESTS
-                + (2+@NEVERMATCH)*@TESTS/2;  # assumes array is symmetric
+subtest 'aroundzero' => sub {
+    my @TESTS = @{ $TESTCASES->{aroundzero} };
+    plan tests => 3*@TESTS;  # assumes array is symmetric
     for my $t (@TESTS) {
         my ($op,$n,$mz) = @$t;
         if ( $n!~/^-/ ) {
@@ -76,8 +73,6 @@ subtest 'zeroes' => sub {
             if ($mz) {  like '0', qr/\A$rn\z/, "N $op$n: $rn should match 0" }
             else { unlike '0', qr/\A$rn\z/, "N $op$n: $rn shouldn't match 0" }
             unlike '-0', qr/\A$rn\z/, "N $op$n: $rn shouldn't match -0";
-            unlike   $_, qr/\A$rn\z/, "N $op$n: $rn shouldn't match $_"
-                for @NEVERMATCH;
         }
         my $rz = re_int_ineq($op, $n, 1);
         if ($mz) {
@@ -87,10 +82,8 @@ subtest 'zeroes' => sub {
             unlike  '0', qr/\A$rz\z/, "Z $op$n: $rz shouldn't match 0";
             unlike '-0', qr/\A$rz\z/, "Z $op$n: $rz shouldn't match -0";
         }
-        unlike $_, qr/\A$rz\z/, "N $op$n: $rz shouldn't match $_"
-            for @NEVERMATCH;
     }
-} or BAIL_OUT("zeroes tests failed");
+} or BAIL_OUT("aroundzero tests failed");
 
 subtest 'error cases' => sub {
     my @TESTS = grep {ref} @{ $TESTCASES->{errorcases} };
@@ -98,6 +91,8 @@ subtest 'error cases' => sub {
     for my $t (@TESTS)
         { ok exception { re_int_ineq(@$t) }, "error on args (@$t)" }
 };
+
+#TODO: Use "zeroes" test cases
 
 diag "The final two test cases can take a few seconds...";
 

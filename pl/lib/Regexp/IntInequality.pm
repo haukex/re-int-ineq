@@ -53,7 +53,7 @@ ES2018 or later, and probably in other languages that support
 L<lookaround assertions|perlre/"Lookaround Assertions"> with the same syntax.
 L<See also|/See Also>.
 
-=head2 C<re_int_ineq I<$op>, I<$n>, I<$allint>, I<$anchor>>
+=head2 C<re_int_ineq I<$op>, I<$n>, I<$allint>, I<$anchor>, I<$zeroes>>
 
 Generates a regex that matches integers according to the following parameters.
 It is returned as a string rather than a precompiled regex so it can more
@@ -121,6 +121,10 @@ integers less than 20 from the string C<"1199 32 5"> with this option on and
 no additional anchors results in C<"11">, C<"9">, C<"9">, C<"3">, C<"2">,
 and C<"5"> - so use this feature with caution and testing!
 
+=head3 C<$zeroes>
+
+TODO: Update documentation for "zeroes" (zeros).
+
 =begin comment
 
  1. <   2  -inf <--------------0- 1
@@ -170,13 +174,14 @@ my $_PREFIX_AI = '(?<![-0-9])';
 my $_SUFFIX = '(?![0-9])';
 
 sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
-    # operator, integer, "all integers" (negative), anchors
-    my ($op, $n, $ai, $anchor) = @_;
+    # operator, integer, "all integers" (negative), anchors, zeroes
+    my ($op, $n, $ai, $anchor, $zeroes) = @_;
+    #TODO: Tests and implementation for "zeroes"
 
     # Handle arguments
     $anchor=1 if @_<4;
     croak "invalid arguments to re_int_ineq"
-        if !defined $op || !defined $n || @_>4;
+        if !defined $op || !defined $n || @_>5;
     if ($ai) { $n =~ /\A-?(?:0|[1-9][0-9]*)\z/ or croak "invalid int" }
     else { $n =~ /\A(?:0|[1-9][0-9]*)\z/ or croak "invalid non-negative int" }
 
