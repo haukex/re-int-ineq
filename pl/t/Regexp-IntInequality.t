@@ -96,19 +96,24 @@ subtest 'error cases' => sub {
 
 subtest 'zeroes never match' => sub {
     my @TESTS = @{ $TESTCASES->{zeroes} };
+    my @NM_NONNEG = map {(               "0$_","00$_")} @TESTS;
+    my @NM_ALLINT = map {("-00$_","-0$_","0$_","00$_")} @TESTS;
     plan tests => 5*3*6*@TESTS**2;
-    run_rangetests(0, 0, [ map {("0$_","00$_")} @TESTS ], \@TESTS);
-    run_rangetests(1, 0, [ map {("-00$_","-0$_","0$_","00$_")} @TESTS ],
-        [ map {($_,"-$_")} @TESTS ] );
+    run_rangetests(0, 0, \@NM_NONNEG, \@TESTS);
+    run_rangetests(1, 0, \@NM_ALLINT, [ map {($_,"-$_")} @TESTS ] );
 };
+
+diag "The final three test cases can take a few seconds...";
 
 subtest 'zeroes' => sub {
     my @TESTS = @{ $TESTCASES->{zeroes} };
-    plan tests => 1;
-    ok 1, 'TODO';
+    my @NONNEG = map {(                     $_,"0$_","00$_")} @TESTS;
+    my @ALLINT = map {("-00$_","-0$_","-$_",$_,"0$_","00$_")} @TESTS;
+    plan skip_all => "TODO: reenable after 'zeroes' is implemented";
+    plan tests => 2 + 6*@NONNEG**2 + 6*@ALLINT**2;
+    is run_rangetests(0, 1, [], \@NONNEG), 0, 'seen_negzero as expected';
+    is run_rangetests(1, 1, [], \@ALLINT), 3*(@ALLINT+1), 'seen_negzero as expected';
 };
-
-diag "The final two test cases can take a few seconds...";
 
 subtest 'non-negative integers (N)' => sub {
     my @TESTS = map {( $$_[0] .. ($$_[1]-1) )}
@@ -148,12 +153,12 @@ sub run_rangetests {
             else        { unlike $i, $rne, "$nz $i isn't != $n and !~ $ne" }
             if ( $i==$n ) { like $i, $req, "$nz $i is    == $n and =~ $eq" }
             else        { unlike $i, $req, "$nz $i isn't == $n and !~ $eq" }
-            $seen_negzero++ if $i=~/\A-0\z/;
+            $seen_negzero++ if $i=~/\A-0+\z/;
         }
         for my $i (@$nm) {
             for my $re ($rlt, $rle, $rgt, $rge, $rne, $req)
                 { unlike $i, $re, "$i never matches $re" } }
-        $seen_negzero++ if $n=~/\A-0\z/;
+        $seen_negzero++ if $n=~/\A-0+\z/;
     }
     return $seen_negzero;
 }
