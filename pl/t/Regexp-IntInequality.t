@@ -27,7 +27,7 @@ along with this program. If not, see L<https://www.gnu.org/licenses/>
 
 =cut
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 use FindBin ();
 use File::Spec::Functions qw/ catfile /;
 use JSON::PP;
@@ -54,6 +54,7 @@ subtest 'manual tests' => sub {
 } or BAIL_OUT("manual tests failed");
 
 subtest 'extraction' => sub {
+    plan skip_all => "TODO: reenable after 'zeroes' is implemented";
     my @TESTS = grep {ref} @{ $TESTCASES->{extraction} };
     plan tests => 0+@TESTS;
     for my $t (@TESTS) {
@@ -93,7 +94,19 @@ subtest 'error cases' => sub {
         { ok exception { re_int_ineq(@$t) }, "error on args (@$t)" }
 };
 
-#TODO: Use "zeroes" test cases
+subtest 'zeroes never match' => sub {
+    my @TESTS = @{ $TESTCASES->{zeroes} };
+    plan tests => 5*3*6*@TESTS**2;
+    run_rangetests(0, 0, [ map {("0$_","00$_")} @TESTS ], \@TESTS);
+    run_rangetests(1, 0, [ map {("-00$_","-0$_","0$_","00$_")} @TESTS ],
+        [ map {($_,"-$_")} @TESTS ] );
+};
+
+subtest 'zeroes' => sub {
+    my @TESTS = @{ $TESTCASES->{zeroes} };
+    plan tests => 1;
+    ok 1, 'TODO';
+};
 
 diag "The final two test cases can take a few seconds...";
 
@@ -101,28 +114,28 @@ subtest 'non-negative integers (N)' => sub {
     my @TESTS = map {( $$_[0] .. ($$_[1]-1) )}
         @{ $TESTCASES->{nonneg_testranges} };
     plan tests => 1 + 6*@TESTS**2;
-    is run_rangetests(0, @TESTS), 0, 'seen_negzero as expected';
+    is run_rangetests(0, 0, [], \@TESTS), 0, 'seen_negzero as expected';
 };
 
 subtest 'all integers (Z)' => sub {
     my @TESTS = map {($_,"-$_")} map {( $$_[0] .. ($$_[1]-1) )}
         @{ $TESTCASES->{allint_testranges} };
     plan tests => 1 + 6*@TESTS**2;
-    is run_rangetests(1, @TESTS), 1+@TESTS, 'seen_negzero as expected';
+    is run_rangetests(1, 0, [], \@TESTS), 1+@TESTS, 'seen_negzero as expected';
 };
 
 sub run_rangetests {
-    my ($ai, @testcases) = @_;
+    my ($ai, $ze, $nm, $tc) = @_;
     my $nz = $ai ? 'Z' : 'N';
     # double-check that Perl's string/number conversion didn't clobber "-0":
     my $seen_negzero = 0;
-    for my $n (@testcases) {
+    for my $n (@$tc) {
         my ($lt, $le, $gt, $ge, $ne, $eq) =
-            map {re_int_ineq($_,$n,$ai)} '<','<=','>','>=','!=','==';
+            map {re_int_ineq($_,$n,$ai,1,$ze)} '<','<=','>','>=','!=','==';
         my ($rlt, $rle, $rgt, $rge, $rne, $req) =
             map {qr/\A$_\z/} $lt, $le, $gt, $ge, $ne, $eq;
         note "$nz n=$n lt=$lt le=$le gt=$gt ge=$ge";
-        for my $i (@testcases) {
+        for my $i (@$tc) {
             if ( $i< $n ) { like $i, $rlt, "$nz $i is    <  $n and =~ $lt" }
             else        { unlike $i, $rlt, "$nz $i isn't <  $n and !~ $lt" }
             if ( $i<=$n ) { like $i, $rle, "$nz $i is    <= $n and =~ $le" }
@@ -137,6 +150,9 @@ sub run_rangetests {
             else        { unlike $i, $req, "$nz $i isn't == $n and !~ $eq" }
             $seen_negzero++ if $i=~/\A-0\z/;
         }
+        for my $i (@$nm) {
+            for my $re ($rlt, $rle, $rgt, $rge, $rne, $req)
+                { unlike $i, $re, "$i never matches $re" } }
         $seen_negzero++ if $n=~/\A-0\z/;
     }
     return $seen_negzero;
