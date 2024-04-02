@@ -169,38 +169,50 @@ my @_ALLINT_ZN = ('-0','0','-[1-9][0-9]*');  # all ints, only zero & negative
 my @_ALLINT_ZP = ('-0','0','[1-9][0-9]*');   # all ints, only zero & positive
 my @_ALLINT_NN = ('0','[1-9][0-9]*');        # all non-negative ints
 
-my $_PREFIX_NN = '(?<![0-9])';
-my $_PREFIX_AI = '(?<![-0-9])';
-my $_SUFFIX = '(?![0-9])';
-
 sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     # operator, integer, "all integers" (negative), anchors, zeroes
     my ($op, $n, $ai, $anchor, $zeroes) = @_;
-    #TODO: Tests and implementation for "zeroes"
 
     # Handle arguments
     $anchor=1 if @_<4;
     croak "invalid arguments to re_int_ineq"
         if !defined $op || !defined $n || @_>5;
-    if ($ai) { $n =~ /\A-?(?:0|[1-9][0-9]*)\z/ or croak "invalid int" }
-    else { $n =~ /\A(?:0|[1-9][0-9]*)\z/ or croak "invalid non-negative int" }
+    my $VALID = $ai
+        ? ( $zeroes ? qr/-?[0-9]+/ : qr/-?(?:0|[1-9][0-9]*)/ )
+        : ( $zeroes ?   qr/[0-9]+/ :   qr/(?:0|[1-9][0-9]*)/ );
+    croak "invalid int" unless $n =~ /\A$VALID\z/;
+    $n =~ s/\A(-?)0+([0-9]+)\z/$1$2/ if $zeroes;
+    my $pfx = !$anchor ? '' : $ai ? '(?<![-0-9])' : '(?<![0-9])';
+    my $sfx = $anchor ? '(?![0-9])' : '';
 
-    # Handle easy operators first
+    # Handle easier operators first
     if ($op eq '==') {
-        return $n==0 && $ai ? '-?0' : $n unless $anchor;
-        return "(?:${_PREFIX_AI}0|-0)$_SUFFIX" if $n==0 && $ai;
-        return $n.$_SUFFIX if $n=~/\A-/;
-        return +( $ai ? $_PREFIX_AI : $_PREFIX_NN ).$n.$_SUFFIX
+        if ($n==0) {
+            return '(?:'.$pfx.( $zeroes ? '0+|-0+' : '0|-0' ).')'.$sfx
+                if $anchor && $ai;
+            return $pfx.( $ai ? '-?' : '' ).( $zeroes ? '0+' : '0' ).$sfx;
+        }
+        my $ns = $n;
+        $ns =~ s/\A(-?)/${1}0*/ if $zeroes;
+        return $n=~/\A-/ ? $ns.$sfx : $pfx.$ns.$sfx;
     }
     elsif ($op eq '!=') {
+        my $zp = $zeroes ? '0*' : '';
+        (my $ns = $n) =~ s/\A(-?)/${1}0*/;
         if (!$anchor) {
-            return         +( $ai ? '-?' : '' ).     '[1-9][0-9]*' if $n==0;
-            return "(?!$n)".( $ai ? '-?' : '' ).'(?:0|[1-9][0-9]*)'
+            my $aip = $ai ? '-?' : '';
+            return "$aip${zp}[1-9][0-9]*" if $n==0;
+            return "(?!$ns)${aip}[0-9]+" if $zeroes;
+            return "(?!$zp$n)$aip(?:0|[1-9][0-9]*)";
         }
-        return "(?!".( $n == 0 ? '-?0' : $n ).$_SUFFIX.")"
-            ."(?:$_PREFIX_AI(?:0|[1-9][0-9]*)|-0|-[1-9][0-9]*)$_SUFFIX"
-                if $ai;
-        return "(?!$n$_SUFFIX)$_PREFIX_NN(?:0|[1-9][0-9]*)$_SUFFIX"
+        if ($ai) {
+            return "(?:$pfx${zp}[1-9]|-${zp}[1-9])[0-9]*$sfx" if $n==0;
+            return "(?!$ns$sfx)(?:${pfx}[0-9]+|-[0-9]+)$sfx" if $zeroes;
+            return "(?!$n$sfx)(?:$pfx(?:0|[1-9][0-9]*)|-0|-[1-9][0-9]*)$sfx";
+        }
+        return "$pfx${zp}[1-9][0-9]*$sfx" if $n==0;
+        return "(?!$ns$sfx)${pfx}[0-9]+$sfx" if $zeroes;
+        return "(?!$n$sfx)$pfx(?:0|[1-9][0-9]*)$sfx";
     }
 
     my $mkre = sub {
@@ -224,22 +236,42 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
 
         my @all;
         # Handle positive values - need prefix
-        if (!$anchor) { push @all, @pos }
-        elsif (@pos) { push @all, ( $ai ? $_PREFIX_AI : $_PREFIX_NN )
-            .( @pos>1 ? '(?:'.join('|',@pos).')' : $pos[0] ) }
+        if ($zeroes) {
+            if ( @pos==1 && $pos[0] eq '0' )  ## no critic (ProhibitCascadingIfElse)
+                { push @all, $pfx.'0+' }
+            elsif ( @pos==2 && $pos[0] eq '0' && $pos[1] eq '[1-9][0-9]*' )
+                { push @all, $pfx.'[0-9]+' }
+            elsif (!$anchor)
+                { push @all, map {"0*$_"} @pos }
+            elsif (@pos)
+                { push @all, $pfx.'0*'.( @pos>1 ? '(?:'.join('|', @pos).')'
+                    : $pos[0] ) }
+        }
+        elsif (!$anchor) { push @all, @pos }
+        elsif (@pos) { push @all, $pfx.( @pos>1 ? '(?:'.join('|',@pos).')'
+            : $pos[0] ) }
 
         # Handle negative values
         # The @neg>5 case is just for a small length reduction:
         # 4: "-a|-b|-c|-d"=11       "-(?:a|b|c|d)"=12     +1
         # 5: "-a|-b|-c|-d|-e"=14    "-(?:a|b|c|d|e)"=14    0
         # 6: "-a|-b|-c|-d|-e|-f"=17 "-(?:a|b|c|d|e|f)"=16 -1
-        if (@neg<6) { push @all, @neg }
+        if ($zeroes) {
+            if ( @neg==1 && $neg[0] eq '-0' )
+                { push @all, '-0+' }
+            elsif ( @neg==2 && $neg[0] eq '-0' && $neg[1] eq '-[1-9][0-9]*' )
+                { push @all, '-[0-9]+' }
+            elsif ( @pos && @neg<3 || !@pos && @neg<2 )
+                { push @all, map { '-0*'.substr($_,1) } @neg }
+            else
+                { push @all, '-0*(?:'.join('|', map {substr $_,1} @neg ).')' }
+        }
+        elsif ( @neg<2 || @pos && @neg<6 ) { push @all, @neg }
         else { push @all, '-(?:'.join('|', map {substr $_,1} @neg ).')' }
 
         # Done
         confess "assertion failed: no re" unless @all;  # uncoverable branch true
-        return +( @all>1 ? '(?:'.join('|',@all).')' : $all[0] )
-            .( $anchor ? $_SUFFIX : '' );
+        return +( @all>1 ? '(?:'.join('|',@all).')' : $all[0] ).$sfx;
     };
 
     # Inspect operator and adjust $n accordingly
