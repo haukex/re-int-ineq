@@ -38,18 +38,19 @@ diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Regexp::IntInequality', 're_int_ineq' }
 is $Regexp::IntInequality::VERSION, '0.90', 'version matches tests';
 
+# space_after: https://github.com/makamaka/JSON-PP/issues/89
+my $json = JSON::PP->new->utf8->space_after;
 my $TESTCASES_FILE = catfile($FindBin::Bin,'testcases.json');
 open my $fh, '<:raw:encoding(UTF-8)', $TESTCASES_FILE
     or die "$TESTCASES_FILE: $!";  ## no critic (RequireCarping)
-my $TESTCASES = JSON::PP->new->utf8->decode(do { local $/=undef; <$fh> });
+my $TESTCASES = $json->decode(do { local $/=undef; <$fh> });
 close $fh;
 
 subtest 'manual tests' => sub {
     my @TESTS = grep {ref} @{ $TESTCASES->{manual_tests} };
     plan tests => 0+@TESTS;
     for my $t (@TESTS)
-        { is re_int_ineq(@$t[0..4]), $$t[5],
-            "$$t[0] $$t[1] ".($$t[2]?'Z':'N').($$t[3]?' anc':' !an').($$t[4]?' wz':' nz')." => $$t[5]"
+        { is re_int_ineq(@$t[0..4]), $$t[5], $json->encode($t)
             or BAIL_OUT("manual tests failed") }
 };
 
@@ -59,7 +60,7 @@ subtest 'extraction' => sub {
     for my $t (@TESTS) {
         my $re = re_int_ineq(@$t[0..4]);
         my @got = $$t[5]=~/$re/g;
-        is_deeply \@got, [ @$t[6..$#$t] ], "extraction with $re"
+        is_deeply \@got, [ @$t[6..$#$t] ], $json->encode($t)
             or diag explain [$t, $re, \@got];
     }
 } or BAIL_OUT("extraction tests failed");
@@ -71,14 +72,14 @@ subtest 'aroundzero' => sub {
         my ($op,$n,$mz) = @$t;
         if ( $n!~/^-/ ) {
             my $rn = re_int_ineq($op, $n);
-            if ($mz) {  like '0', qr/\A$rn\z/, "N $op$n: $rn should match 0" }
+            if ($mz) { like '0', qr/\A$rn\z/, "N $op$n: $rn should match 0" }
             else { unlike '0', qr/\A$rn\z/, "N $op$n: $rn shouldn't match 0" }
             unlike '-0', qr/\A$rn\z/, "N $op$n: $rn shouldn't match -0";
         }
         my $rz = re_int_ineq($op, $n, 1);
         if ($mz) {
-            like  '0', qr/\A$rz\z/, "Z $op$n: $rz should match 0";
-            like '-0', qr/\A$rz\z/, "Z $op$n: $rz should match -0";
+            like    '0', qr/\A$rz\z/, "Z $op$n: $rz should match 0";
+            like   '-0', qr/\A$rz\z/, "Z $op$n: $rz should match -0";
         } else {
             unlike  '0', qr/\A$rz\z/, "Z $op$n: $rz shouldn't match 0";
             unlike '-0', qr/\A$rz\z/, "Z $op$n: $rz shouldn't match -0";
