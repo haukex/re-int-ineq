@@ -164,11 +164,6 @@ my @_RNG_GT  = ( map({"[$_-9]"} 1..7), '[89]', '9', '(?!)' );
 my @_RNG_LT0 = ( '(?!)', '0', '[01]', map({"[0-$_]"} 2..8) );
 my @_RNG_LT1 = ( '(?!)', '(?!)', '1', '[12]', map({"[1-$_]"} 3..8) );
 
-# A few constants
-my @_ALLINT_ZN = ('-0','0','-[1-9][0-9]*');  # all ints, only zero & negative
-my @_ALLINT_ZP = ('-0','0','[1-9][0-9]*');   # all ints, only zero & positive
-my @_ALLINT_NN = ('0','[1-9][0-9]*');        # all non-negative ints
-
 sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     # operator, integer, "all integers" (negative), anchors, zeroes
     my ($op, $n, $ai, $anchor, $zeroes) = @_;
@@ -238,10 +233,10 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         # Handle positive values - need prefix
         if ($zeroes) {
             if ( @pos==1 && $pos[0] eq '0' )  ## no critic (ProhibitCascadingIfElse)
-                { push @all, $pfx.'0+' }
-            elsif ( @pos==2 && $pos[0] eq '0' && $pos[1] eq '[1-9][0-9]*' )
+                { push @all, $pfx.'0+' }  # "<1"/"<=0"  TODO: can this be covered in the special cases below?
+            elsif ( @pos==1 && $pos[0] eq '[0-9]+' )
                 { push @all, $pfx.'[0-9]+' }
-            elsif (!$anchor)
+            elsif ( !$anchor && @neg && @pos<3 )
                 { push @all, map {"0*$_"} @pos }
             elsif (@pos)
                 { push @all, $pfx.'0*'.( @pos>1 ? '(?:'.join('|', @pos).')'
@@ -252,20 +247,18 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
             : $pos[0] ) }
 
         # Handle negative values
+        if ($zeroes) {
+            if ( @neg==1 && $neg[0] eq '-0' )  # ">-1"/">=0"  TODO: can this be covered in the special cases below?
+                { push @all, '-0+' }
+            elsif ( @pos && @neg<3 || !@pos && @neg<2 )
+                { push @all, map { $_ eq '-[0-9]+' ? $_ : '-0*'.substr($_,1) } @neg }
+            else
+                { push @all, '-0*(?:'.join('|', map {substr $_,1} @neg ).')' }
+        }
         # The @neg>5 case is just for a small length reduction:
         # 4: "-a|-b|-c|-d"=11       "-(?:a|b|c|d)"=12     +1
         # 5: "-a|-b|-c|-d|-e"=14    "-(?:a|b|c|d|e)"=14    0
         # 6: "-a|-b|-c|-d|-e|-f"=17 "-(?:a|b|c|d|e|f)"=16 -1
-        if ($zeroes) {
-            if ( @neg==1 && $neg[0] eq '-0' )
-                { push @all, '-0+' }
-            elsif ( @neg==2 && $neg[0] eq '-0' && $neg[1] eq '-[1-9][0-9]*' )
-                { push @all, '-[0-9]+' }
-            elsif ( @pos && @neg<3 || !@pos && @neg<2 )
-                { push @all, map { '-0*'.substr($_,1) } @neg }
-            else
-                { push @all, '-0*(?:'.join('|', map {substr $_,1} @neg ).')' }
-        }
         elsif ( @neg<2 || @pos && @neg<6 ) { push @all, @neg }
         else { push @all, '-(?:'.join('|', map {substr $_,1} @neg ).')' }
 
@@ -287,11 +280,31 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     else { croak "unknown operator" }
 
     # Handle some special cases the code below doesn't handle
-    return '(?!)' if $n==0 && !$gt_not_lt && !$ai;  # "<0"
-    return $mkre->( $ai ? @_ALLINT_ZP : @_ALLINT_NN )
-        if $n==-1 && $gt_not_lt;  # ">-1"/">=0"
-    return $mkre->( $gt_not_lt ? '[1-9][0-9]*' : '-[1-9][0-9]*' )
-        if $n==0;  # ">0"/">=1" and "<0"/"<=-1"
+    if ( $n==-1 && $gt_not_lt ) {  # ">-1"/">=0"
+        if ($zeroes) {
+            return $mkre->('-0','[0-9]+') if $ai;
+            return $mkre->(     '[0-9]+') }
+        if ($ai) {
+            return '(?:[1-9][0-9]*|-?0)' if !$anchor;
+            return $mkre->('-0','0','[1-9][0-9]*') }
+        return     $mkre->(     '0','[1-9][0-9]*');
+    }
+    if ( $n==1 && !$gt_not_lt ) {  # "<1"/"<=0"
+        return $mkre->('-[0-9]+','0') if $zeroes && $ai;
+        return '(?:-?0|-[1-9][0-9]*)' if !$anchor && $ai;
+    }
+    if ( $n==0 ) {
+        return $mkre->('[1-9][0-9]*') if $gt_not_lt;  # ">0"/">=1"
+        return '(?!)' unless $ai;  # "<0" for non-neg
+        return $mkre->('-[1-9][0-9]*');  # "<0"/"<=-1"
+    }
+    if ( $ai && !$anchor && !$zeroes ) {
+        # just a minor length optimization:
+        #      '(?:[01]|-0|-[1-9][0-9]*)'
+        return '(?:1|-?0|-[1-9][0-9]*)' if !$gt_not_lt && $n==2;
+        #      '(?:0|[1-9][0-9]*|-[01])'
+        return '(?:[1-9][0-9]*|-?0|-1)' if $gt_not_lt && $n==-2;
+    }
 
     # Prepare some variables
     my $reflect = $ai && $n<0;             # reflect the number line over zero
@@ -303,8 +316,15 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     my %subex;
 
     # Add the other half of the number line
-    if ($ai && !$gt_not_lt)
-        { $subex{$_}++ for $reflect ? @_ALLINT_NN : @_ALLINT_ZN }
+    if ($ai && !$gt_not_lt) {
+        #TODO optimize the following and check if one or two of these can be merged with the special cases above
+        if ($reflect) {
+            if ($zeroes) { $subex{$_}++ for ('[0-9]+')  }
+            else { $subex{$_}++ for ('0','[1-9][0-9]*') }
+        }
+        elsif ($zeroes) { $subex{$_}++ for ('0','-[0-9]+') }
+        else { $subex{$_}++ for ('-0','0','-[1-9][0-9]*') }
+    }
 
     # Add expressions for all ints with a different number of digits
     if ($gt_not_lt) {  # ">": all ints with more digits should match

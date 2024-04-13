@@ -50,9 +50,8 @@ subtest 'manual tests' => sub {
     my @TESTS = grep {ref} @{ $TESTCASES->{manual_tests} };
     plan tests => 0+@TESTS;
     for my $t (@TESTS)
-        { is re_int_ineq(@$t[0..4]), $$t[5], $json->encode($t)
-            or BAIL_OUT("manual tests failed") }
-};
+        { is re_int_ineq(@$t[0..4]), $$t[5], $json->encode($t) }
+} or BAIL_OUT("manual tests failed");
 
 subtest 'extraction' => sub {
     my @TESTS = grep {ref} @{ $TESTCASES->{extraction} };
