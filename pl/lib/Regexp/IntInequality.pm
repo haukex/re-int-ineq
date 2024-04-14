@@ -214,11 +214,12 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         my %se = map {$_=>1} @_;
         confess "assertion failed: no re" unless %se;  # uncoverable branch true
 
-        # Remove unneeded zeroes
-        delete $se{'0'}
-            if $se{'[1-9]?[0-9]'} || grep {/\A\[0-?[0-9]\]\z/} keys %se;
-        delete $se{'-0'}
-            if $se{'-[1-9]?[0-9]'} || grep {/\A-\[0-?[0-9]\]\z/} keys %se;
+        # Remove unneeded zeroes / add -0 if needed
+        my $w_z  = grep {  /\A(?:\[1-9\]\?)?\[0-?[0-9]\]\+?\z/} keys %se;
+        my $w_nz = grep { /\A-(?:\[1-9\]\?)?\[0-?[0-9]\]\+?\z/} keys %se;
+        if ($w_nz) { delete $se{'-0'} }
+        elsif ($se{'0'} && $ai) { $se{'-0'}++ }
+        delete $se{'0'} if $w_z;
 
         # Separate positive and negative terms
         my (@pos, @neg);
@@ -280,21 +281,12 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     # Handle some special cases mkre and the code below don't handle
     # such as '0+', '-0+', '-?0', and $an<1
     if ( $n==-1 && $gt_not_lt ) {  # ">-1"/">=0"
-        if ($zeroes) {
-            return "(?:${pfx}[0-9]+|-0+)$sfx" if $ai;
-            return $mkre->('[0-9]+');
-        }
-        if ($ai) {
-            return '(?:[1-9][0-9]*|-?0)' if !$anchor;
-            return $mkre->('-0','0','[1-9][0-9]*');
-        }
+        return $ai? "(?:${pfx}[0-9]+|-0+)$sfx" : $mkre->('[0-9]+') if $zeroes;
+        return '(?:[1-9][0-9]*|-?0)' if !$anchor && $ai;
         return $mkre->('0','[1-9][0-9]*');
     }
     if ( $n==1 && !$gt_not_lt ) {  # "<1"/"<=0"
-        if ($zeroes) {
-            return "(?:${pfx}0+|-[0-9]+)$sfx" if $ai;
-            return $pfx.'0+'.$sfx;
-        }
+        return $ai ? "(?:${pfx}0+|-[0-9]+)$sfx" : $pfx.'0+'.$sfx if $zeroes;
         return '(?:-?0|-[1-9][0-9]*)' if !$anchor && $ai;
     }
     if ( $n==0 ) {
@@ -322,7 +314,7 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     # Add the other half of the number line
     if ($ai && !$gt_not_lt) {
         if ($zeroes) { $subex{ ($reflect?'':'-').'[0-9]+' }++ }
-        else { $subex{$_}++ for '0', '-0', ($reflect?'':'-').'[1-9][0-9]*' }
+        else { $subex{$_}++ for '0',($reflect?'':'-').'[1-9][0-9]*' }
     }
 
     # Add expressions for all ints with a different number of digits
