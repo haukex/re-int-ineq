@@ -214,11 +214,11 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         my %se = map {$_=>1} @_;
         confess "assertion failed: no re" unless %se;  # uncoverable branch true
 
-        # A bit of optimization
+        # Remove unneeded zeroes
         delete $se{'0'}
-            if $se{'[1-9]?[0-9]'} || grep {/\A\[0-?\d\]\z/} keys %se;
+            if $se{'[1-9]?[0-9]'} || grep {/\A\[0-?[0-9]\]\z/} keys %se;
         delete $se{'-0'}
-            if $se{'-[1-9]?[0-9]'} || grep {/\A-\[0-?\d\]\z/} keys %se;
+            if $se{'-[1-9]?[0-9]'} || grep {/\A-\[0-?[0-9]\]\z/} keys %se;
 
         # Separate positive and negative terms
         my (@pos, @neg);
@@ -232,10 +232,8 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         my @all;
         # Handle positive values - need prefix
         if ($zeroes) {
-            if ( @pos==1 && $pos[0] eq '0' )  ## no critic (ProhibitCascadingIfElse)
-                { push @all, $pfx.'0+' }  # "<1"/"<=0"  TODO: can this be covered in the special cases below?
-            elsif ( @pos==1 && $pos[0] eq '[0-9]+' )
-                { push @all, $pfx.'[0-9]+' }
+            if ( @pos==1 && $pos[0] eq '[0-9]+' )
+                { push @all, $pfx.$pos[0] }  # prevent 0* prefix on this
             elsif ( !$anchor && @neg && @pos<3 )
                 { push @all, map {"0*$_"} @pos }
             elsif (@pos)
@@ -248,10 +246,10 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
 
         # Handle negative values
         if ($zeroes) {
-            if ( @neg==1 && $neg[0] eq '-0' )  # ">-1"/">=0"  TODO: can this be covered in the special cases below?
-                { push @all, '-0+' }
-            elsif ( @pos && @neg<3 || !@pos && @neg<2 )
-                { push @all, map { $_ eq '-[0-9]+' ? $_ : '-0*'.substr($_,1) } @neg }
+            if ( @neg==1 && $neg[0] eq '-[0-9]+' )
+                { push @all, @neg }  # prevent 0* prefix on this
+            elsif ( @pos && @neg<3 || @neg<2 )
+                { push @all, map { '-0*'.substr($_,1) } @neg }
             else
                 { push @all, '-0*(?:'.join('|', map {substr $_,1} @neg ).')' }
         }
@@ -259,7 +257,7 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         # 4: "-a|-b|-c|-d"=11       "-(?:a|b|c|d)"=12     +1
         # 5: "-a|-b|-c|-d|-e"=14    "-(?:a|b|c|d|e)"=14    0
         # 6: "-a|-b|-c|-d|-e|-f"=17 "-(?:a|b|c|d|e|f)"=16 -1
-        elsif ( @neg<2 || @pos && @neg<6 ) { push @all, @neg }
+        elsif ( @pos && @neg<6 || @neg<2 ) { push @all, @neg }
         else { push @all, '-(?:'.join('|', map {substr $_,1} @neg ).')' }
 
         # Done
@@ -279,18 +277,24 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     }
     else { croak "unknown operator" }
 
-    # Handle some special cases the code below doesn't handle
+    # Handle some special cases mkre and the code below don't handle
+    # such as '0+', '-0+', '-?0', and $an<1
     if ( $n==-1 && $gt_not_lt ) {  # ">-1"/">=0"
         if ($zeroes) {
-            return $mkre->('-0','[0-9]+') if $ai;
-            return $mkre->(     '[0-9]+') }
+            return "(?:${pfx}[0-9]+|-0+)$sfx" if $ai;
+            return $mkre->('[0-9]+');
+        }
         if ($ai) {
             return '(?:[1-9][0-9]*|-?0)' if !$anchor;
-            return $mkre->('-0','0','[1-9][0-9]*') }
-        return     $mkre->(     '0','[1-9][0-9]*');
+            return $mkre->('-0','0','[1-9][0-9]*');
+        }
+        return $mkre->('0','[1-9][0-9]*');
     }
     if ( $n==1 && !$gt_not_lt ) {  # "<1"/"<=0"
-        return $mkre->('-[0-9]+','0') if $zeroes && $ai;
+        if ($zeroes) {
+            return "(?:${pfx}0+|-[0-9]+)$sfx" if $ai;
+            return $pfx.'0+'.$sfx;
+        }
         return '(?:-?0|-[1-9][0-9]*)' if !$anchor && $ai;
     }
     if ( $n==0 ) {
@@ -317,13 +321,8 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
 
     # Add the other half of the number line
     if ($ai && !$gt_not_lt) {
-        #TODO optimize the following and check if one or two of these can be merged with the special cases above
-        if ($reflect) {
-            if ($zeroes) { $subex{$_}++ for ('[0-9]+')  }
-            else { $subex{$_}++ for ('0','[1-9][0-9]*') }
-        }
-        elsif ($zeroes) { $subex{$_}++ for ('0','-[0-9]+') }
-        else { $subex{$_}++ for ('-0','0','-[1-9][0-9]*') }
+        if ($zeroes) { $subex{ ($reflect?'':'-').'[0-9]+' }++ }
+        else { $subex{$_}++ for '0', '-0', ($reflect?'':'-').'[1-9][0-9]*' }
     }
 
     # Add expressions for all ints with a different number of digits
