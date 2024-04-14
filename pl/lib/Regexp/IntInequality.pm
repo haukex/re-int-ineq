@@ -235,11 +235,14 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         if ($zeroes) {
             if ( @pos==1 && $pos[0] eq '[0-9]+' )
                 { push @all, $pfx.$pos[0] }  # prevent 0* prefix on this
-            elsif ( !$anchor && @neg && @pos<3 )
-                { push @all, map {"0*$_"} @pos }
-            elsif (@pos)
-                { push @all, $pfx.'0*'.( @pos>1 ? '(?:'.join('|', @pos).')'
-                    : $pos[0] ) }
+            # Length savings:
+            # 4: "(?:0*(?:a|b|c|d)|-e)"=20  "(?:0*a|0*b|0*c|0*d|-e)"=22  +2
+            # 3: "(?:0*(?:a|b|c)|-d)"=18    "(?:0*a|0*b|0*c|-d)"=18       0
+            # 2: "(?:0*(?:a|b)|-c)"=16      "(?:0*a|0*b|-c)"=14          -2
+            elsif ( !$anchor && @neg && @pos<3 || @pos<2 )
+                { push @all, map { $pfx.'0*'.$_ } @pos }
+            else
+                { push @all, $pfx.'0*(?:'.join('|', @pos).')' }
         }
         elsif (!$anchor) { push @all, @pos }
         elsif (@pos) { push @all, $pfx.( @pos>1 ? '(?:'.join('|',@pos).')'
@@ -249,16 +252,19 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         if ($zeroes) {
             if ( @neg==1 && $neg[0] eq '-[0-9]+' )
                 { push @all, @neg }  # prevent 0* prefix on this
+            # Length savings:
+            # 3: "(?:a|-0*(?:b|c|d))"=18  "(?:a|-0*b|-0*c|-0*d)"=20  +2
+            # 2: "(?:a|-0*(?:b|c))"=16    "(?:a|-0*b|-0*c)"=15       -1
             elsif ( @pos && @neg<3 || @neg<2 )
                 { push @all, map { '-0*'.substr($_,1) } @neg }
             else
                 { push @all, '-0*(?:'.join('|', map {substr $_,1} @neg ).')' }
         }
-        # The @neg>5 case is just for a small length reduction:
-        # 4: "-a|-b|-c|-d"=11       "-(?:a|b|c|d)"=12     +1
-        # 5: "-a|-b|-c|-d|-e"=14    "-(?:a|b|c|d|e)"=14    0
-        # 6: "-a|-b|-c|-d|-e|-f"=17 "-(?:a|b|c|d|e|f)"=16 -1
-        elsif ( @pos && @neg<6 || @neg<2 ) { push @all, @neg }
+        # Length savings:
+        # 4: "(?:x|-a|-b|-c|-d)"=17        "(?:x|-(?:a|b|c|d))"=18      +1
+        # 5: "(?:x|-a|-b|-c|-d|-e)"=20     "(?:x|-(?:a|b|c|d|e))"=20     0
+        # 6: "(?:x|-a|-b|-c|-d|-e|-f)"=23  "(?:x|-(?:a|b|c|d|e|f))"=22  -1
+        elsif ( @pos && @neg<5 || @neg<2 ) { push @all, @neg }
         else { push @all, '-(?:'.join('|', map {substr $_,1} @neg ).')' }
 
         # Done
@@ -296,9 +302,9 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     }
     if ( $ai && !$anchor && !$zeroes ) {
         # just a minor length optimization:
-        #      '(?:[01]|-0|-[1-9][0-9]*)'
+        #    '(?:[01]|-0|-[1-9][0-9]*)'
         return '(?:1|-?0|-[1-9][0-9]*)' if !$gt_not_lt && $n==2;
-        #      '(?:0|[1-9][0-9]*|-[01])'
+        #     '(?:0|[1-9][0-9]*|-[01])'
         return '(?:[1-9][0-9]*|-?0|-1)' if $gt_not_lt && $n==-2;
     }
 
