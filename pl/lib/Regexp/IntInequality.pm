@@ -172,13 +172,11 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     $anchor=1 if @_<4;
     croak "invalid arguments to re_int_ineq"
         if !defined $op || !defined $n || @_>5;
-    my $VALID = $ai
-        ? ( $zeroes ? qr/-?[0-9]+/ : qr/-?(?:0|[1-9][0-9]*)/ )
-        : ( $zeroes ?   qr/[0-9]+/ :   qr/(?:0|[1-9][0-9]*)/ );
+    my $VALID = ($ai ? '-?' : '').($zeroes ? '[0-9]+' : '(?:0|[1-9][0-9]*)');
     croak "invalid int" unless $n =~ /\A$VALID\z/;
     $n =~ s/\A(-?)0+([0-9]+)\z/$1$2/ if $zeroes;
     my $pfx = !$anchor ? '' : $ai ? '(?<![-0-9])' : '(?<![0-9])';
-    my $sfx = $anchor ? '(?![0-9])' : '';
+    my $sfx = !$anchor ? '' : '(?![0-9])';
 
     # Handle easier operators first
     if ($op eq '==') {
@@ -215,11 +213,12 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
         confess "assertion failed: no re" unless %se;  # uncoverable branch true
 
         # Remove unneeded zeroes / add -0 if needed
+        # This regex covers: '[1-9]?[0-9]', '[0-9]+', and '[0-N]'
         my $w_z  = grep {  /\A(?:\[1-9\]\?)?\[0-?[0-9]\]\+?\z/} keys %se;
         my $w_nz = grep { /\A-(?:\[1-9\]\?)?\[0-?[0-9]\]\+?\z/} keys %se;
-        if ($w_nz) { delete $se{'-0'} }
-        elsif ($se{'0'} && $ai) { $se{'-0'}++ }
-        delete $se{'0'} if $w_z;
+        if ($w_nz) { delete $se{'-0'} }  # -0 is already matched elsewhere
+        elsif ($se{'0'} && $ai) { $se{'-0'}++ }  # if $ai, add -0 if 0 in set
+        delete $se{'0'} if $w_z;  # 0 is already matched elsewhere
 
         # Separate positive and negative terms
         my (@pos, @neg);
@@ -232,34 +231,27 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
 
         my @all;
         # Handle positive values - need prefix
-        if ($zeroes) {
-            if ( @pos==1 && $pos[0] eq '[0-9]+' )
-                { push @all, $pfx.$pos[0] }  # prevent 0* prefix on this
-            # Length savings:
-            # 4: "(?:0*(?:a|b|c|d)|-e)"=20  "(?:0*a|0*b|0*c|0*d|-e)"=22  +2
-            # 3: "(?:0*(?:a|b|c)|-d)"=18    "(?:0*a|0*b|0*c|-d)"=18       0
-            # 2: "(?:0*(?:a|b)|-c)"=16      "(?:0*a|0*b|-c)"=14          -2
-            elsif ( !$anchor && @neg && @pos<3 || @pos<2 )
-                { push @all, map { $pfx.'0*'.$_ } @pos }
-            else
-                { push @all, $pfx.'0*(?:'.join('|', @pos).')' }
-        }
+        # Length savings:
+        # 4: "(?:0*(?:a|b|c|d)|-e)"=20  "(?:0*a|0*b|0*c|0*d|-e)"=22  +2
+        # 3: "(?:0*(?:a|b|c)|-d)"=18    "(?:0*a|0*b|0*c|-d)"=18       0
+        # 2: "(?:0*(?:a|b)|-c)"=16      "(?:0*a|0*b|-c)"=14          -2
+        if ( $zeroes && ( !$anchor && @neg && @pos<3 || @pos<2 ) )  ## no critic (ProhibitCascadingIfElse)
+            { push @all, map { $pfx.( $_ eq '[0-9]+' ? '' : '0*' ).$_ } @pos }
+        elsif ($zeroes)
+            { push @all, $pfx.'0*(?:'.join('|', @pos).')' }
         elsif (!$anchor) { push @all, @pos }
-        elsif (@pos) { push @all, $pfx.( @pos>1 ? '(?:'.join('|',@pos).')'
-            : $pos[0] ) }
+        elsif (@pos<2) { push @all, map {$pfx.$_} @pos }
+        else { push @all, $pfx.'(?:'.join('|', @pos).')' }
 
         # Handle negative values
-        if ($zeroes) {
-            if ( @neg==1 && $neg[0] eq '-[0-9]+' )
-                { push @all, @neg }  # prevent 0* prefix on this
-            # Length savings:
-            # 3: "(?:a|-0*(?:b|c|d))"=18  "(?:a|-0*b|-0*c|-0*d)"=20  +2
-            # 2: "(?:a|-0*(?:b|c))"=16    "(?:a|-0*b|-0*c)"=15       -1
-            elsif ( @pos && @neg<3 || @neg<2 )
-                { push @all, map { '-0*'.substr($_,1) } @neg }
-            else
-                { push @all, '-0*(?:'.join('|', map {substr $_,1} @neg ).')' }
-        }
+        # Length savings:
+        # 3: "(?:a|-0*(?:b|c|d))"=18  "(?:a|-0*b|-0*c|-0*d)"=20  +2
+        # 2: "(?:a|-0*(?:b|c))"=16    "(?:a|-0*b|-0*c)"=15       -1
+        if ( $zeroes && ( @pos && @neg<3 || @neg<2 ) )
+            { push @all,
+                map { $_ eq '-[0-9]+' ? $_ : '-0*'.substr($_,1) } @neg }
+        elsif ($zeroes)
+            { push @all, '-0*(?:'.join('|', map {substr $_,1} @neg ).')' }
         # Length savings:
         # 4: "(?:x|-a|-b|-c|-d)"=17        "(?:x|-(?:a|b|c|d))"=18      +1
         # 5: "(?:x|-a|-b|-c|-d|-e)"=20     "(?:x|-(?:a|b|c|d|e))"=20     0
@@ -294,6 +286,8 @@ sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
     if ( $n==1 && !$gt_not_lt ) {  # "<1"/"<=0"
         return $ai ? "(?:${pfx}0+|-[0-9]+)$sfx" : $pfx.'0+'.$sfx if $zeroes;
         return '(?:-?0|-[1-9][0-9]*)' if !$anchor && $ai;
+        # the code below already handles this correctly:
+        #return $mkre->('0', $ai ? '-[1-9][0-9]*' : () );
     }
     if ( $n==0 ) {
         return $mkre->('[1-9][0-9]*') if $gt_not_lt;  # ">0"/">=1"
