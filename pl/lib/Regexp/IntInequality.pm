@@ -39,7 +39,7 @@ This module provides a single function, C<re_int_ineq>, which generates
 regular expressions that match integers that fulfill a specified inequality
 (greater than, less than, and so on). By default, only non-negative integers
 are matched (minus signs are ignored), and optionally all integers can be
-matched, including negative. Integers with leading zeros are never matched.
+matched, including negative.
 
 B<Note:> Normally, this is not a task for regular expressions, instead it is
 often preferable to use regular expressions or other methods to extract the
@@ -49,11 +49,15 @@ embedding these regular expressions as part of a larger expression or grammar,
 or when dealing with an API that only accepts regular expressions.
 
 The generated regular expressions are valid in Perl, Python, and JavaScript
-ES2018 or later, and probably in other languages that support
-L<lookaround assertions|perlre/"Lookaround Assertions"> with the same syntax.
+ES2018 or later, and probably in other languages and libraries that support
+L<lookaround assertions|perlre/"Lookaround Assertions"> with the same syntax,
+such as L<PCRE|https://www.pcre.org/>.
 L<See also|/See Also>.
 
 =head2 C<re_int_ineq I<$op>, I<$n>, I<$allint>, I<$anchor>, I<$zeroes>>
+
+Alternatively, you can call the function with a hashref with named arguments:
+C<< re_int_ineq({ op=>$op, n=>$n, allint=>$allint, anchor=>$anchor, zeroes=>$zeroes }) >>
 
 Generates a regex that matches integers according to the following parameters.
 It is returned as a string rather than a precompiled regex so it can more
@@ -65,12 +69,14 @@ user input.
 
 =head3 C<$op>
 
+Required.
 The operator the regex should implement, one of C<< ">" >>, C<< ">=" >>,
 C<< "<" >>, C<< "<=" >>, C<"!=">, or C<"=="> (the latter is provided simply
 for completeness, despite the name of this module.)
 
 =head3 C<$n>
 
+Required.
 The integer against which the regex should compare. It may not have leading
 zeroes and may only be negative when L<C<$allint>|/$allint> is a true value.
 
@@ -91,8 +97,10 @@ versa.
 =head3 C<$anchor> and Anchoring
 
 B<Note:> This option defaults to being on I<only> when the function is called
-with less than four arguments, otherwise the option is turned on by any true
-value and turned off by any false value, I<including> C<undef>.
+with less than four arguments, or when using the named arguments hashref, it
+defaults to being on I<only> when the key C<"anchor"> does not exist in the
+options hash. Otherwise, the option is turned on by any true value and turned
+off by any false value, I<including> C<undef>!
 
 When this option is on (see explanation above), the regex will have zero-width
 assertions (a.k.a. anchors) surrounding the expression in order to prevent
@@ -163,13 +171,22 @@ TODO: Update documentation for "zeroes" (zeros).
 my @_RNG_GT  = ( map({"[$_-9]"} 1..7), '[89]', '9', '(?!)' );
 my @_RNG_LT0 = ( '(?!)', '0', '[01]', map({"[0-$_]"} 2..8) );
 my @_RNG_LT1 = ( '(?!)', '(?!)', '1', '[12]', map({"[1-$_]"} 3..8) );
+my %_KNOWN_ARGS = map {($_=>1)} qw/ op n allint anchor zeroes /;
 
-sub re_int_ineq {  ## no critic (ProhibitExcessComplexity)
+sub re_int_ineq {  ## no critic (ProhibitExcessComplexity,RequireArgUnpacking)
     # operator, integer, "all integers" (negative), anchors, zeroes
     my ($op, $n, $ai, $anchor, $zeroes) = @_;
 
     # Handle arguments
-    $anchor=1 if @_<4;
+    if (@_==1 && ref $_[0] eq 'HASH') {
+        my $h = $_[0];
+        $_KNOWN_ARGS{$_} or croak "invalid arguments to re_int_ineq: $_"
+            for keys %$h;
+        ($op, $n, $ai, $anchor, $zeroes) =
+            @$h{'op','n','allint','anchor','zeroes'};
+        $anchor=1 if !exists $$h{anchor};
+    }
+    else { $anchor=1 if @_<4 }
     croak "invalid arguments to re_int_ineq"
         if !defined $op || !defined $n || @_>5;
     my $VALID = ($ai ? '-?' : '').($zeroes ? '[0-9]+' : '(?:0|[1-9][0-9]*)');
@@ -369,6 +386,10 @@ L<https://www.npmjs.com/package/re-int-ineq>
 =item Web interface
 
 L<https://haukex.github.io/re-int-ineq/>
+
+=item Regular expressions to match numbers
+
+L<Regexp::Common::number>
 
 =back
 

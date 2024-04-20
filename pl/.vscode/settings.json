@@ -9,9 +9,11 @@
     "cSpell.ignoreWords": [
         "ALLINT",
         "NEVERMATCH",
+        "PCRE",
         "TESTCASES",
         "catfile",
         "errorcases",
+        "hashref",
         "haukex",
         "ineq",
         "ints",

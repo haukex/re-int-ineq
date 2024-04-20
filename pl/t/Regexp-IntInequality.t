@@ -27,7 +27,7 @@ along with this program. If not, see L<https://www.gnu.org/licenses/>
 
 =cut
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use FindBin ();
 use File::Spec::Functions qw/ catfile /;
 use JSON::PP;
@@ -124,6 +124,32 @@ subtest 'error cases' => sub {
     plan tests => 0+@TESTS;
     for my $t (@TESTS)
         { ok exception { re_int_ineq(@$t) }, "error on args (@$t)" }
+};
+
+subtest 'named arguments' => sub {  ## no critic (RequireTestLabels)
+    is re_int_ineq({op=>'<', n=>123}), re_int_ineq('<', 123);
+    is re_int_ineq({op=>'<', n=>123}), re_int_ineq('<', 123, 0, 1, 0);
+    is re_int_ineq({op=>'<=', n=>44, allint=>1}),
+        re_int_ineq('<=', 44, 1);
+    is re_int_ineq({op=>'<=', n=>44, anchor=>0}),
+        re_int_ineq('<=', 44, 0, 0);
+    is re_int_ineq({op=>'<=', n=>44, zeroes=>1}),
+        re_int_ineq('<=', 44, 0, 1, 1);
+    is re_int_ineq({op=>'<=', n=>44, anchor=>undef}),
+        re_int_ineq('<=', 44, 0, 0, 0);
+    is re_int_ineq({op=>'<=', n=>44, anchor=>undef}),
+        re_int_ineq('<=', 44, undef, undef);
+    is re_int_ineq({op=>'<=', n=>44, allint=>undef, anchor=>undef,
+        zeroes=>undef}), re_int_ineq('<=', 44, 0, 0, 0);
+    is re_int_ineq({op=>'<=', n=>44, allint=>0, anchor=>1, zeroes=>0}),
+        re_int_ineq('<=', 44, 0, 1, 0);
+    is re_int_ineq({op=>'<=', n=>44, allint=>1, anchor=>0, zeroes=>1}),
+        re_int_ineq('<=', 44, 1, 0, 1);
+    ok exception { re_int_ineq({}) };
+    ok exception { re_int_ineq({op=>'>='}) };
+    ok exception { re_int_ineq({n=>5}) };
+    ok exception { re_int_ineq({op=>'>=', n=>5}, 6) };
+    ok exception { re_int_ineq({op=>'>=', n=>5, zeros=>1}) };
 };
 
 subtest 'zeroes never match' => sub {
