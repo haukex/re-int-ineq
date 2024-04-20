@@ -57,11 +57,11 @@ L<See also|/See Also>.
 =head2 C<re_int_ineq I<$op>, I<$n>, I<$allint>, I<$anchor>, I<$zeroes>>
 
 Alternatively, you can call the function with a hashref with named arguments:
-C<< re_int_ineq({ op=>$op, n=>$n, allint=>$allint, anchor=>$anchor, zeroes=>$zeroes }) >>
+B<C<< re_int_ineq({ op=>$op, n=>$n, allint=>$allint, anchor=>$anchor, zeroes=>$zeroes }) >>>
 
-Generates a regex that matches integers according to the following parameters.
-It is returned as a string rather than a precompiled regex so it can more
-easily be embedded in larger expressions.
+This function generates a regex that matches integers according to the
+following parameters. The regex is returned as a string rather than a
+precompiled regex so it can more easily be embedded in larger expressions.
 
 Note the regular expressions will grow significantly the more digits are in
 the integer. I suggest not to generate regular expressions from unbounded
@@ -69,22 +69,21 @@ user input.
 
 =head3 C<$op>
 
-Required.
-The operator the regex should implement, one of C<< ">" >>, C<< ">=" >>,
-C<< "<" >>, C<< "<=" >>, C<"!=">, or C<"=="> (the latter is provided simply
-for completeness, despite the name of this module.)
+Required. The operator the regex should implement, one of C<< ">" >>,
+C<< ">=" >>, C<< "<" >>, C<< "<=" >>, C<"!=">, or C<"=="> (the latter is
+provided simply for completeness, despite the name of this module.)
 
 =head3 C<$n>
 
-Required.
-The integer against which the regex should compare. It may not have leading
-zeroes and may only be negative when L<C<$allint>|/$allint> is a true value.
+Required. The integer against which the regex should compare.
+It may be negative only when L<C<$allint>|/$allint> is a true value.
+It may have leading zeroes only when L<C<$zeroes>|/$zeroes> is a true value.
 
 =head3 C<$allint>
 
-If C<$allint> is B<missing or a false value>, then the generated regex will
-only cover positive integers and zero, and C<$n> may not be negative.
-B<Note> that in this case, any minus signs before integers are not
+If C<$allint> is B<missing or a false value> (the default), then the generated
+regex will only cover positive integers and zero, and C<$n> may not be
+negative. B<Note> that in this case, any minus signs before integers are not
 included in the regex. This means that when using the regex, for example, to
 extract integers greater than 10 from the string C<"3 5 15 -7 -12">, it will
 match C<"15"> B<and> C<"12">!
@@ -99,16 +98,16 @@ versa.
 B<Note:> This option defaults to being on I<only> when the function is called
 with less than four arguments, or when using the named arguments hashref, it
 defaults to being on I<only> when the key C<"anchor"> does not exist in the
-options hash. Otherwise, the option is turned on by any true value and turned
-off by any false value, I<including> C<undef>!
+options hash. Otherwise, the option is turned on by any true value and
+B<turned off by any false value, I<including> C<undef>>.
 
-When this option is on (see explanation above), the regex will have zero-width
-assertions (a.k.a. anchors) surrounding the expression in order to prevent
-matches inside of integers. For example, when extracting integers less than 20
-from the string C<"1199 32 5">, the generated regex will by default I<not>
-extract the C<"11"> or C<"19"> from C<"1199">, and will only match C<"5">. On
-the other hand, any non-digit characters (including minus signs) are
-considered delimiters: extracting all integers less than 5 from the string
+B<When this option is on I<(see explanation above)>>, the regex will have
+zero-width assertions (a.k.a. anchors) surrounding the expression in order to
+prevent matches inside of integers. For example, when extracting integers less
+than 20 from the string C<"1199 32 5">, the generated regex will by default
+I<not> extract the C<"11"> or C<"19"> from C<"1199">, and will only match
+C<"5">. On the other hand, any non-digit characters (including minus signs)
+are considered delimiters: extracting all integers less than 5 from the string
 C<"2x3-3-24y25"> with L<C<$allint>|/$allint> turned on will result in C<"2">,
 C<"3">, C<"-3">, and C<"-24">.
 
@@ -123,15 +122,19 @@ L<Regexp::Common|Regexp::Common>, and then using normal numeric comparisons to
 check that it is in the range you expect.
 
 If on the other hand you want to turn off the default anchors described above,
-perhaps because you want to implement your own, then you can pass a false
-value for the C<$anchor> option. Repeating the above example, extracting
-integers less than 20 from the string C<"1199 32 5"> with this option on and
-no additional anchors results in C<"11">, C<"9">, C<"9">, C<"3">, C<"2">,
-and C<"5"> - so use this feature with caution and testing!
+perhaps because you want to implement your own, then you can
+B<pass a false value for the C<$anchor> option>. Repeating the above example,
+extracting integers less than 20 from the string C<"1199 32 5"> with this
+option on and no additional anchors results in C<"11">, C<"9">, C<"9">,
+C<"3">, C<"2">, and C<"5"> - so use this feature with caution and testing!
 
 =head3 C<$zeroes>
 
-TODO: Update documentation for "zeroes" (zeros).
+If C<$zeroes> is B<missing or a false value> (the default), the generated
+regular expression will not allow for leading zeroes on the integer being
+matched, and will not allow leading zeroes on L<C<$n>|/$n>.
+
+If C<$zeroes> is B<a true value>, leading zeroes are allowed.
 
 =begin comment
 
