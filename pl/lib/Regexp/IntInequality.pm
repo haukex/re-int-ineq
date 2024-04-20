@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use Carp;
 
-our $VERSION = '0.90';
+our $VERSION = '0.98';
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
 our @EXPORT_OK = qw/ re_int_ineq /;

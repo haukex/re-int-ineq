@@ -12,7 +12,7 @@ WriteMakefile(
 		provides => {
 			'Regexp::IntInequality' => {
 				file => 'lib/Regexp/IntInequality.pm',
-				version => '0.90',
+				version => '0.98',
 			},
 		},
 		resources => {

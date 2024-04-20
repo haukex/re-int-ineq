@@ -36,7 +36,7 @@ sub exception (&) { eval { shift->(); 1 } ? undef : ($@ || die) }  ## no critic 
 
 diag "This is Perl $] at $^X on $^O";
 BEGIN { use_ok 'Regexp::IntInequality', 're_int_ineq' }
-is $Regexp::IntInequality::VERSION, '0.90', 'version matches tests';
+is $Regexp::IntInequality::VERSION, '0.98', 'version matches tests';
 
 # space_after: https://github.com/makamaka/JSON-PP/issues/89
 my $json = JSON::PP->new->utf8->space_after;

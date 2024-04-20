@@ -9,7 +9,7 @@ Development Environment
 - [ ] `( cd xt && cpanm --installdeps . )` - for author tests
 - [ ] Testing on all Perl versions locally:
   - [ ] requires Docker
-  - [ ] `( cd dev/allver-test && cpanm --installdeps . )`
+  - [ ] `( cd dev && cpanm --installdeps . )`
 
 Testing
 -------
