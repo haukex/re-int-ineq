@@ -60,6 +60,8 @@ severity = 4
 severity = 2
 [Variables::ProhibitReusedNames]
 severity = 4
+[Modules::ProhibitExcessMainComplexity]
+severity = 2
 END_CRITIC
 	close $fh;
 }

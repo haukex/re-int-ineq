@@ -27,7 +27,7 @@ along with this program. If not, see L<https://www.gnu.org/licenses/>
 
 =cut
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use FindBin ();
 use File::Spec::Functions qw/ catfile /;
 use JSON::PP;
@@ -45,6 +45,39 @@ open my $fh, '<:raw:encoding(UTF-8)', $TESTCASES_FILE
     or die "$TESTCASES_FILE: $!";  ## no critic (RequireCarping)
 my $TESTCASES = $json->decode(do { local $/=undef; <$fh> });
 close $fh;
+
+my %_op_matrix = (
+    #        n-x n n+x
+    '>'  => [ 0, 0, 1 ],
+    '>=' => [ 0, 1, 1 ],
+    '<'  => [ 1, 0, 0 ],
+    '<=' => [ 1, 1, 0 ],
+    '!=' => [ 1, 0, 1 ],
+    '==' => [ 0, 1, 0 ],
+);
+subtest 'test manual testcases' => sub {
+    # This test case makes sure the manual_tests compile and match as expected
+    # (without actually testing re_int_ineq)
+    my @TESTS = grep {ref} @{ $TESTCASES->{manual_tests} };
+    for my $t (@TESTS) {
+        my ($op, $n, $ai) = @$t[0, 1, 2];
+        my $re = qr/\A$$t[5]\z/;
+        for my $o (10,2,1) {
+            next if !$ai && $n-$o<0;
+            if ($_op_matrix{$op}[0])
+                {    like $n-$o, $re, "$n-$o $op $n =~ $re" }
+            else { unlike $n-$o, $re, "$n-$o $op $n !~ $re" }
+        }
+        if ($_op_matrix{$op}[1])
+            {    like $n, $re, "$n $op $n =~ $re" }
+        else { unlike $n, $re, "$n $op $n !~ $re" }
+        for my $o (1,2,10) {
+            if ($_op_matrix{$op}[2])
+                {    like $n+$o, $re, "$n+$o $op $n =~ $re" }
+            else { unlike $n+$o, $re, "$n+$o $op $n !~ $re" }
+        }
+    }
+} or BAIL_OUT("failed to validate manual testcases");
 
 subtest 'manual tests' => sub {
     my @TESTS = grep {ref} @{ $TESTCASES->{manual_tests} };
