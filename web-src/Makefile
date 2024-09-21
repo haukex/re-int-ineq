@@ -10,7 +10,7 @@ test:
 
 .PHONY: clean
 clean:
-	git clean -dxf dist
+	git clean -dxf dist .parcel-cache
 
 .PHONY: installdeps
 installdeps:
