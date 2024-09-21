@@ -2,6 +2,8 @@
 name: Basic Perl Tests
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'pl/**'
   pull_request:

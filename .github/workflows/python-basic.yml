@@ -2,6 +2,8 @@
 name: Basic Python Tests, Lint, and Coverage
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'py/**'
   pull_request:
@@ -25,7 +27,7 @@ jobs:
           cache: pip
           # remember to keep in sync with Makefile:
           cache-dependency-path: |
-            dev/requirements.txt
+            py/dev/requirements.txt
       - name: Install dependencies
         working-directory: ./py
         run: make installdeps

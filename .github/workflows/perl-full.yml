@@ -1,10 +1,11 @@
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
 name: Full Perl Tests, Lint, and Coverage (all versions and OSes)
 on:
+  # this workflow is somewhat expensive, so only run when explicitly called/tagged
   push:
-    # this workflow is somewhat expensive, so only run when explicitly tagged
     tags:
       - 'pl-**'
+  workflow_dispatch:
 jobs:
   all-ver:
     name: Perl ${{ matrix.perlver }} on Linux
