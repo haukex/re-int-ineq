@@ -1,5 +1,6 @@
 {
     "recommendations": [
+        "dbaeumer.vscode-eslint",
         "ms-vscode.makefile-tools",
         "ms-python.python",
         "ms-python.vscode-pylance",
@@ -10,6 +11,7 @@
         "oderwat.indent-rainbow",
         "semanticdiff.semanticdiff",
         "tamasfe.even-better-toml",
+        "streetsidesoftware.code-spell-checker",
     ]
 }
 /* vim: set filetype=javascript ts=4 sw=4 expandtab : */

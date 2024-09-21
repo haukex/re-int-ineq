@@ -4,7 +4,7 @@
 py_code_locs = re_int_ineq tests dev/*.py
 # Remember to keep in sync with GitHub Actions workflows:
 requirement_txts = dev/requirements.txt
-perm_checks = ./* .gitignore .vscode
+perm_checks = ./* .gitignore
 
 # Remember venv only sets up the `python3` alias if it was called from `python3`,
 # so it's generally more reliable to call `python` instead, though on some old

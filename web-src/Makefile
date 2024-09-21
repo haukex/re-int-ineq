@@ -1,10 +1,6 @@
 
 # Run `npm start` for the dev server
 
-.PHONY: deploy
-deploy: dist/index.html
-	cp dist/index.html ../docs/
-
 dist/index.html: src/index.html src/main.ts test package.json package-lock.json tsconfig.json .parcelrc
 	npm run build
 
@@ -14,7 +10,7 @@ test:
 
 .PHONY: clean
 clean:
-	git clean -dxf dist
+	git clean -dxf dist .parcel-cache
 
 .PHONY: installdeps
 installdeps:
