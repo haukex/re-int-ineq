@@ -2,9 +2,6 @@
 set -euxo pipefail
 cd "$( dirname "${BASH_SOURCE[0]}" )"/..
 
-sudo apt-get update
-sudo apt-get install -y shellcheck vim
-
 ( cd pl/xt && cpanm --installdeps --notest . )
 (
     cd py
