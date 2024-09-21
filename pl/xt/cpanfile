@@ -4,3 +4,5 @@ requires 'Test::MinimumVersion';
 requires 'Test::Pod';
 requires 'Test::DistManifest';
 requires 'Capture::Tiny';
+requires 'Devel::Cover';
+requires 'JSON::MaybeXS';
