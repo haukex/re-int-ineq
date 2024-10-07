@@ -6,9 +6,33 @@
         "files.trimTrailingWhitespace": false,
         "editor.rulers": [ 78 ],
     },
+    "[markdown]": {
+        "editor.rulers": [ 100 ],
+    },
     "cSpell.language": "en,en-US",
+    "eslint.validate": [ "javascript", "typescript" ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.testing.unittestArgs": [ "-v", "-s", "${workspaceFolder}/py", ],
+    "pylint.importStrategy": "fromEnvironment",
+    "pylint.args": [ "--rcfile=${workspaceFolder}/py/pyproject.toml", ],
+    "pylint.severity": {
+        // raised the default severity so they are easier to find
+        "convention": "Warning",
+        "refactor": "Warning",
+        "info": "Warning"
+    },
+    "flake8.importStrategy": "fromEnvironment",
+    "flake8.args": [ "--toml-config=${workspaceFolder}/py/pyproject.toml", ],
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "mypy-type-checker.reportingScope": "workspace",
+    "mypy-type-checker.args": [ "--config-file", "${workspaceFolder}/py/pyproject.toml", ],
+    "indentRainbow.ignoreErrorLanguages": [
+    	"python",
+    	"markdown",
+    	"perl"
+    ],
     "cSpell.enableFiletypes": [ "perl" ],
-    "cSpell.words": [ "Hauke", "Dämpfling", "Daempfling", "haukex" ],
     "cSpell.ignoreWords": [
         "allint",
         "TESTCASES",
@@ -40,25 +64,5 @@
         "testranges",
         "uncoverable",
     ],
-    "eslint.validate": [ "javascript", "typescript" ],
-    "python.terminal.activateEnvInCurrentTerminal": true,
-    "python.testing.pytestEnabled": false,
-    "python.testing.unittestEnabled": true,
-    "python.testing.unittestArgs": [ "-v", "-s", "${workspaceFolder}/py", ],
-    "python.analysis.typeCheckingMode": "strict", // the rest of the pyright settings are in pyproject.toml
-    "pylint.importStrategy": "fromEnvironment",
-    "pylint.args": [ "--rcfile=${workspaceFolder}/py/pyproject.toml", ],
-    "pylint.severity": {
-        // raised the default severity so they are easier to find
-        "convention": "Warning",
-        "refactor": "Warning",
-        "info": "Warning"
-    },
-    "flake8.importStrategy": "fromEnvironment",
-    "flake8.args": [ "--toml-config=${workspaceFolder}/py/pyproject.toml", ],
-    "mypy-type-checker.importStrategy": "fromEnvironment",
-    "mypy-type-checker.reportingScope": "workspace",
-    "mypy-type-checker.args": [ "--config-file", "${workspaceFolder}/py/pyproject.toml", ],
-    "indentRainbow.ignoreErrorLanguages": [ "python", "markdown", "perl" ],
 }
 /* vim: set filetype=javascript ts=4 sw=4 expandtab : */

@@ -233,10 +233,12 @@ def re_int_ineq(op :str, n: int, allint :bool = False, anchor :bool = True) -> s
 
     gt_not_lt :bool
     if op in ('>','>='):
-        if op == '>=': n -= 1
+        if op == '>=':
+            n -= 1
         gt_not_lt = True
     elif op in ('<','<='):
-        if op == '<=': n += 1
+        if op == '<=':
+            n += 1
         gt_not_lt = False
     else:
         raise ValueError("Invalid operator")
@@ -249,7 +251,8 @@ def re_int_ineq(op :str, n: int, allint :bool = False, anchor :bool = True) -> s
         return mkre( {'[1-9][0-9]*'} if gt_not_lt else {'-[1-9][0-9]*'} )
 
     reflect = allint and n<0
-    if reflect: gt_not_lt = not gt_not_lt
+    if reflect:
+        gt_not_lt = not gt_not_lt
     an = str( -n if reflect else n )
     minus = '-' if reflect else ''
     assert int(an)>0
@@ -275,13 +278,19 @@ def re_int_ineq(op :str, n: int, allint :bool = False, anchor :bool = True) -> s
 
     for i,d in enumerate(an):
         rest :str
-        if (r := len(an)-i-1) > 1: rest = f"[0-9]{{{r}}}"
-        elif r==1: rest = '[0-9]'
-        else: rest = ''
+        if (r := len(an)-i-1) > 1:
+            rest = f"[0-9]{{{r}}}"
+        elif r==1:
+            rest = '[0-9]'
+        else:
+            rest = ''
         rng :str
-        if gt_not_lt: rng = _RNG_GT[int(d)]
-        elif len(an)==1 or i: rng = _RNG_LT0[int(d)]
-        else: rng = _RNG_LT1[int(d)]
+        if gt_not_lt:
+            rng = _RNG_GT[int(d)]
+        elif len(an)==1 or i:
+            rng = _RNG_LT0[int(d)]
+        else:
+            rng = _RNG_LT1[int(d)]
         if rng != '(?!)':
             subex.add( minus + an[:i] + rng + rest )
 

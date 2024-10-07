@@ -46,7 +46,7 @@ Releasing
   - [ ] **If** making a simultaneous release of all ports, see `/pl/DevNotes.md`!
 - [ ] `git push --tags`
 - [ ] watch GitHub Actions
-- [ ] `python3 -m build`
+- [ ] `python -m build`
 - [ ] `twine check dist/re-int-ineq-*.tar.gz`
 - [ ] `tar tzvf dist/re-int-ineq-*.tar.gz` to inspect the package
   - TODO Later: `tests/test_re_int_ineq.py` is being included, but `testcases.json` not. It's probably better
