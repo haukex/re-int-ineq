@@ -1,15 +1,15 @@
 ## To get help on this makefile, run `make help`.
 # https://www.gnu.org/software/make/manual/make.html
 
+# Adapt these variables for this project:
 py_code_locs = re_int_ineq tests dev/*.py
+# Hint: $(filter-out whatever,$(py_code_locs))
 # Remember to keep in sync with GitHub Actions workflows:
 requirement_txts = dev/requirements.txt
 perm_checks = ./* .gitignore
 
-# Remember venv only sets up the `python3` alias if it was called from `python3`,
-# so it's generally more reliable to call `python` instead, though on some old
-# systems that may still refer to Python 2 (`sudo apt-get install python-is-python3`).
-PYTHON3BIN = python  # user can change this on the `make` command line
+# The user can change the following on the command line, but note that some tools below may not use this variable!
+PYTHON3BIN = python
 
 .PHONY: help tasklist installdeps test
 .PHONY: smoke-checks nix-checks shellcheck ver-checks other-checks coverage unittest
@@ -37,7 +37,7 @@ installdeps:  ## Install project dependencies
 smoke-checks:  ## Basic smoke tests
 	@set -euxo pipefail
 	# example: [[ "$$OSTYPE" =~ linux.* ]]  # this project only runs on Linux
-	[[ "$$($(PYTHON3BIN) --version)" =~ ^Python\ 3\. ]]
+	[[ "$$($(PYTHON3BIN) --version)" =~ ^Python\ 3\. ]]  # make sure we're on Python 3
 
 nix-checks:  ## Checks that depend on a *NIX OS/FS
 	@set -euo pipefail
@@ -53,7 +53,7 @@ nix-checks:  ## Checks that depend on a *NIX OS/FS
 		else  # we can probably depend on permission bits being correct
 			UNRELIABLE_PERMS=""
 			set -x
-			simple-perms -r $(perm_checks)  # if this errors, run `simple-perms -m ...` for auto fix
+			$(PYTHON3BIN) -m simple_perms -r $(perm_checks)  # if this errors, run `simple-perms -m ...` for auto fix
 			test -z "$$( find . \( -type d -name '.venv*' -prune \) -o \( -iname '*.sh' ! -executable -print \) )"
 		fi
 	fi
@@ -70,15 +70,15 @@ ver-checks:  ## Checks that depend on the Python version
 	@set -euxo pipefail
 	# https://microsoft.github.io/pyright/#/command-line
 	npx pyright --project pyproject.toml --pythonpath "$$( $(PYTHON3BIN) -c 'import sys; print(sys.executable)' )" $(py_code_locs)
-	mypy --config-file pyproject.toml $(py_code_locs)
+	$(PYTHON3BIN) -m mypy --config-file pyproject.toml $(py_code_locs)
 	# Note I'm not sure if the following are actually version-dependent, but because they parse the Python code, I'll leave them here.
-	flake8 --toml-config=pyproject.toml $(py_code_locs)
-	pylint --rcfile=pyproject.toml --recursive=y $(py_code_locs)
+	$(PYTHON3BIN) -m flake8 --toml-config=pyproject.toml $(py_code_locs)
+	$(PYTHON3BIN) -m pylint --rcfile=pyproject.toml --recursive=y $(py_code_locs)
 
 other-checks:  ## Checks not depending on the Python version
 	@set -euxo pipefail
 	# note the following is on one line b/c GitHub macOS Action Runners are running bash 3.2 and the multiline version didn't work there...
-	for REQ in $(requirement_txts); do pur --dry-run-changed --nonzero-exit-code -r "$$REQ"; done
+	for REQ in $(requirement_txts); do $(PYTHON3BIN) -m pur --skip-gt --dry-run-changed --nonzero-exit-code -r "$$REQ"; done
 
 unittest:  ## Run unit tests
 	@PYTHONDEVMODE=1 PYTHONWARNINGS=error PYTHONWARNDEFAULTENCODING=1 $(PYTHON3BIN) -m unittest -v
@@ -86,17 +86,14 @@ unittest:  ## Run unit tests
 coverage:  ## Run unit tests with coverage
 	@set -euxo pipefail
 	# Note: Don't add command-line arguments here, put them in the rcfile
+	# We also don't use --fail_under=100 because then the report won't be written.
 	PYTHONDEVMODE=1 PYTHONWARNINGS=error PYTHONWARNDEFAULTENCODING=1 $(PYTHON3BIN) -m coverage run --rcfile=pyproject.toml
 	$(PYTHON3BIN) -m coverage report --rcfile=pyproject.toml
 	# $(PYTHON3BIN) -m coverage html --rcfile=pyproject.toml
 	$(PYTHON3BIN) -m coverage xml --rcfile=pyproject.toml
-	set +x
-	# We don't use --fail_under=100 above because then the report won't be written.
-	# Also, the GitHub macOS runners didn't like the following (probably due to the old bash),
-	# so we'll just hand it off to Perl:
-	$(PYTHON3BIN) -m coverage json --rcfile=pyproject.toml -o- | jq .totals.percent_covered \
-		| perl -wMstrict -0777 -MTerm::ANSIColor=colored -ne \
-		's/\s+\z//; print "=> ",colored([$$_==100?"green":"red"],"$$_% Coverage")," <=\n"; exit($$_==100?0:1)'
+	$(PYTHON3BIN) -m coverage json --rcfile=pyproject.toml -o- \
+		| perl -wM5.014 -MJSON::PP=decode_json -MTerm::ANSIColor=colored -0777 -ne \
+		'$$_=decode_json($$_)->{totals}{percent_covered};print"=> ",colored([$$_==100?"green":"red"],"$$_% Coverage")," <=\n";exit($$_==100?0:1)'
 
 # https://stackoverflow.com/q/8889035
 help:   ## Show this help

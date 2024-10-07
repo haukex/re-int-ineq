@@ -9,13 +9,14 @@ on:
 jobs:
   tests:
     name: CPython ${{ matrix.python-version }} on ${{ matrix.os }}
+    # Reminder: Keep in sync with dev/local-actions.sh
     strategy:
       fail-fast: false
       matrix:
         os: [Ubuntu, Windows, macOS]
+        # Remember that some tests below only run on one version, so keep that up-to-date.
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     runs-on: ${{ matrix.os }}-latest
-    # Reminder: Keep in sync with dev/local-actions.sh
     steps:
       - name: Disable autocrlf on Windows
         if: ${{ matrix.os == 'Windows' }}
@@ -32,7 +33,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
-          #TODO Later: As far as I can tell, the caching is not really reliable?
           # https://github.com/actions/setup-python#caching-packages-dependencies
           cache: pip
           # remember to keep in sync with Makefile:

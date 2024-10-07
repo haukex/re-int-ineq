@@ -51,7 +51,8 @@ class RegexpIntInequalityTestCase(unittest.TestCase):
 
     def test_manual(self):
         for case in self.testcases['manual_tests']:
-            if isinstance(case, str): continue
+            if isinstance(case, str):
+                continue
             assert isinstance(case, list)
             op :str
             n :Union[int,str]
@@ -64,7 +65,8 @@ class RegexpIntInequalityTestCase(unittest.TestCase):
 
     def test_extraction(self):
         for case in self.testcases['extraction']:
-            if isinstance(case, str): continue
+            if isinstance(case, str):
+                continue
             assert isinstance(case, list)
             op :str
             n :Union[int,str]
@@ -88,8 +90,10 @@ class RegexpIntInequalityTestCase(unittest.TestCase):
             op,n,mz = case
             if not str(n).startswith('-'):
                 rn = re.compile('\\A'+re_int_ineq(op, int(n))+'\\Z')
-                if mz:   self.assertRegex('0', rn, f"N {op}{n}: {rn} should match 0")
-                else: self.assertNotRegex('0', rn, f"N {op}{n}: {rn} shouldn't match 0")
+                if mz:
+                    self.assertRegex(   '0', rn, f"N {op}{n}: {rn} should match 0")
+                else:
+                    self.assertNotRegex('0', rn, f"N {op}{n}: {rn} shouldn't match 0")
                 self.assertNotRegex('-0', rn, f"N {op}{n}: {rn} shouldn't match -0")
                 for nm in nevermatch:
                     self.assertNotRegex(nm, rn, f"N {op}{n}: {rn} shouldn't match {nm!r}")
@@ -105,7 +109,8 @@ class RegexpIntInequalityTestCase(unittest.TestCase):
 
     def test_errors(self):
         for case in self.testcases['errorcases']:
-            if isinstance(case, str): continue
+            if isinstance(case, str):
+                continue
             assert isinstance(case, list)
             with self.assertRaises((TypeError, ValueError)):
                 re_int_ineq(*case)
@@ -137,18 +142,30 @@ class RegexpIntInequalityTestCase(unittest.TestCase):
             req = re.compile('\\A'+re_int_ineq('==', ii, ai)+'\\Z')
             for j in cases:
                 jj = int(j)
-                if jj < ii:  self.assertRegex(str(j), rlt, f"{nz} {j} is    <  {i} and =~ {rlt}")
-                else:     self.assertNotRegex(str(j), rlt, f"{nz} {j} isn't <  {i} and !~ {rlt}")
-                if jj <= ii: self.assertRegex(str(j), rle, f"{nz} {j} is    <= {i} and =~ {rle}")
-                else:     self.assertNotRegex(str(j), rle, f"{nz} {j} isn't <= {i} and !~ {rle}")
-                if jj > ii:  self.assertRegex(str(j), rgt, f"{nz} {j} is    >  {i} and =~ {rgt}")
-                else:     self.assertNotRegex(str(j), rgt, f"{nz} {j} isn't >  {i} and !~ {rgt}")
-                if jj >= ii: self.assertRegex(str(j), rge, f"{nz} {j} is    >= {i} and =~ {rge}")
-                else:     self.assertNotRegex(str(j), rge, f"{nz} {j} isn't >= {i} and !~ {rge}")
-                if jj != ii: self.assertRegex(str(j), rne, f"{nz} {j} is    != {i} and =~ {rne}")
-                else:     self.assertNotRegex(str(j), rne, f"{nz} {j} isn't != {i} and !~ {rne}")
-                if jj == ii: self.assertRegex(str(j), req, f"{nz} {j} is    == {i} and =~ {req}")
-                else:     self.assertNotRegex(str(j), req, f"{nz} {j} isn't == {i} and !~ {req}")
+                if jj < ii:
+                    self.assertRegex(   str(j), rlt, f"{nz} {j} is    <  {i} and =~ {rlt}")
+                else:
+                    self.assertNotRegex(str(j), rlt, f"{nz} {j} isn't <  {i} and !~ {rlt}")
+                if jj <= ii:
+                    self.assertRegex(   str(j), rle, f"{nz} {j} is    <= {i} and =~ {rle}")
+                else:
+                    self.assertNotRegex(str(j), rle, f"{nz} {j} isn't <= {i} and !~ {rle}")
+                if jj > ii:
+                    self.assertRegex(   str(j), rgt, f"{nz} {j} is    >  {i} and =~ {rgt}")
+                else:
+                    self.assertNotRegex(str(j), rgt, f"{nz} {j} isn't >  {i} and !~ {rgt}")
+                if jj >= ii:
+                    self.assertRegex(   str(j), rge, f"{nz} {j} is    >= {i} and =~ {rge}")
+                else:
+                    self.assertNotRegex(str(j), rge, f"{nz} {j} isn't >= {i} and !~ {rge}")
+                if jj != ii:
+                    self.assertRegex(   str(j), rne, f"{nz} {j} is    != {i} and =~ {rne}")
+                else:
+                    self.assertNotRegex(str(j), rne, f"{nz} {j} isn't != {i} and !~ {rne}")
+                if jj == ii:
+                    self.assertRegex(   str(j), req, f"{nz} {j} is    == {i} and =~ {req}")
+                else:
+                    self.assertNotRegex(str(j), req, f"{nz} {j} isn't == {i} and !~ {req}")
 
     def test_cli(self):
         cli_cases = (

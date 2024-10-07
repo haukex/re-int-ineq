@@ -30,7 +30,7 @@ shift $((OPTIND-1))
 
 activate_venv () {
     echo "+ . $VENV_PATH/.venv$1/{Scripts,bin}/activate"
-    # Remember venv only sets up the `python` alias, not `python3`
+    # Remember venv may only set up the `python` alias, not necessarily `python3`
     if [ -e "$VENV_PATH/.venv$1/Scripts" ]; then
         # shellcheck source=/dev/null
         . "$VENV_PATH/.venv$1/Scripts/activate"
@@ -48,6 +48,7 @@ activate_venv () {
     fi
 }
 
+# Reminder: Keep version list in sync with `.github/workflows/tests.yml`.
 for PY_VER in 3.9 3.10 3.11 3.12 3.13; do
     echo -e "\e[1;33m====================================================> Python $PY_VER <====================================================\e[0m"
 
